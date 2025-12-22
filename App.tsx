@@ -55,6 +55,7 @@ const App: React.FC = () => {
   const [editingTransaction, setEditingTransaction] = useState<any | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [transactionYear, setTransactionYear] = useState(new Date().getFullYear());
 
   const [data, setData] = useState<FinancialData>({
     cardTransactions: [],
@@ -106,8 +107,10 @@ const App: React.FC = () => {
     if (!showModal) {
       setSelectedMonths([]);
       setEditingTransaction(null);
+    } else {
+      setTransactionYear(currentDate.getFullYear());
     }
-  }, [showModal]);
+  }, [showModal, currentDate]);
 
   const yearlySummary = useMemo(() => {
     // ... (logic remains exactly the same, this assumes 'data' is populated correctly)
@@ -170,8 +173,8 @@ const App: React.FC = () => {
     setCurrentDate(newDate);
   };
 
-  const handleAddCardTransaction = async (base: Omit<CardTransaction, 'id'>, targetMonths: number[]) => {
-    const year = currentDate.getFullYear();
+  const handleAddCardTransaction = async (base: Omit<CardTransaction, 'id'>, targetMonths: number[], yearOverride?: number) => {
+    const year = yearOverride || currentDate.getFullYear();
     setIsLoading(true);
 
     // Create promises for all insertions
@@ -188,7 +191,7 @@ const App: React.FC = () => {
   };
 
   // Intelligent wrapper for adding cards based on settings
-  const handleSmartAddCard = async (base: Omit<CardTransaction, 'id'>, targetMonths: number[]) => {
+  const handleSmartAddCard = async (base: Omit<CardTransaction, 'id'>, targetMonths: number[], yearOverride?: number) => {
     const providerSettings = appSettings.card_settings[base.provider];
     const closeDay = providerSettings?.closeDay || 100; // default high to never trigger if missing
 
@@ -197,21 +200,28 @@ const App: React.FC = () => {
     const isClosed = today.getDate() >= closeDay;
 
     let finalMonths = targetMonths;
+    let finalYear = yearOverride || currentDate.getFullYear();
 
     // If user didn't select specific months (auto mode) and card is closed, shift to next month
-    if (targetMonths.length === 1 && targetMonths[0] === today.getMonth()) {
+    if (targetMonths.length === 1 && targetMonths[0] === today.getMonth() && finalYear === today.getFullYear()) {
       if (isClosed) {
         const nextMonth = (today.getMonth() + 1) % 12;
         finalMonths = [nextMonth];
+
+        // Handle year rollover
+        if (nextMonth === 0) {
+          finalYear += 1;
+        }
+
         alert(`Cartão virou! Lançamento jogado para o próximo mês (Fatura fecha dia ${closeDay}).`);
       }
     }
 
-    await handleAddCardTransaction(base, finalMonths);
+    await handleAddCardTransaction(base, finalMonths, finalYear);
   };
 
-  const handleAddIncome = async (base: Omit<Income, 'id'>, targetMonths: number[]) => {
-    const year = currentDate.getFullYear();
+  const handleAddIncome = async (base: Omit<Income, 'id'>, targetMonths: number[], yearOverride?: number) => {
+    const year = yearOverride || currentDate.getFullYear();
     setIsLoading(true);
 
     const promises = targetMonths.map(m =>
@@ -226,8 +236,8 @@ const App: React.FC = () => {
     setShowModal(null);
   };
 
-  const handleAddFixedExpense = async (base: Omit<FixedExpense, 'id' | 'isPaid' | 'month' | 'year'>, targetMonths: number[]) => {
-    const year = currentDate.getFullYear();
+  const handleAddFixedExpense = async (base: Omit<FixedExpense, 'id' | 'isPaid' | 'month' | 'year'>, targetMonths: number[], yearOverride?: number) => {
+    const year = yearOverride || currentDate.getFullYear();
     setIsLoading(true);
 
     const promises = targetMonths.map(m =>
@@ -352,7 +362,7 @@ const App: React.FC = () => {
               className="bg-emerald-500 hover:bg-emerald-400 text-slate-900 p-1.5 md:p-3 rounded-lg md:rounded-xl transition-all flex items-center gap-2 px-3 md:px-5 shadow-lg active:scale-95"
             >
               <BrainCircuit size={14} className="md:w-5 md:h-5" />
-              <span className="text-[9px] md:text-sm font-black uppercase tracking-wider">{loadingAi ? '...' : 'Insights'}</span>
+              <span className="text-[9px] md:text-sm font-black uppercase tracking-wider">{loadingAi ? '...' : 'Análise'}</span>
             </button>
           </div>
         </div>
@@ -709,18 +719,18 @@ const App: React.FC = () => {
                   totalInstallments: parseInt(formDataObj.get('totalInstallments') as string) || 1,
                   remainingInstallments: parseInt(formDataObj.get('totalInstallments') as string) || 1,
                   purchaseDate: new Date().toISOString()
-                }, finalMonths);
+                }, finalMonths, transactionYear);
               } else if (showModal === TransactionType.INCOME) {
                 handleAddIncome({
                   description: formDataObj.get('description') as string, amount: val,
                   source: formDataObj.get('source') as IncomeSource, date: new Date().toISOString()
-                }, finalMonths);
+                }, finalMonths, transactionYear);
               } else if (showModal === TransactionType.FIXED_EXPENSE) {
                 const category = formDataObj.get('category') as FixedExpenseCategory;
                 handleAddFixedExpense({
                   category, name: category === FixedExpenseCategory.OUTROS ? formDataObj.get('customName') as string : category,
                   amount: val, dueDate: formDataObj.get('dueDate') as string
-                }, finalMonths);
+                }, finalMonths, transactionYear);
               }
             }} className="space-y-6">
 
@@ -774,29 +784,38 @@ const App: React.FC = () => {
               {/* REPETIÇÃO COMPACTADA - Oculta na edição para evitar complexidade */}
               {!editingTransaction && (
                 <div className="space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[10px] md:text-xs font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
-                      <Repeat size={14} className="text-emerald-500" /> Meses
-                    </label>
-                    <button type="button" onClick={selectAllMonths} className="text-[9px] md:text-xs font-black uppercase text-emerald-600 bg-white px-3 py-1 rounded-lg border border-slate-100 hover:bg-emerald-50 transition-colors">
-                      {selectedMonths.length === 12 ? 'Reset' : 'Todos'}
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-6 gap-2">
-                    {MONTHS.map((m, idx) => {
-                      const isPast = currentDate.getFullYear() === new Date().getFullYear() && idx < new Date().getMonth();
-                      return (
-                        <button
-                          key={m} type="button" onClick={() => !isPast && toggleMonthSelection(idx)}
-                          disabled={isPast}
-                          className={`py-2 px-1 text-[9px] md:text-sm font-black rounded-lg border-2 transition-all ${isPast ? 'bg-slate-100 text-slate-300 border-transparent cursor-not-allowed' :
-                            selectedMonths.includes(idx) ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-transparent text-slate-400 hover:border-slate-200'
-                            }`}
-                        >
-                          {m.substring(0, 3)}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2 bg-white rounded-lg p-1 border border-slate-100">
+                        <button type="button" onClick={() => setTransactionYear(y => y - 1)} className="p-1 hover:bg-slate-50 text-slate-400"><ChevronLeft size={14} /></button>
+                        <span className="text-xs font-black text-slate-700 min-w-[3rem] text-center">{transactionYear}</span>
+                        <button type="button" onClick={() => setTransactionYear(y => y + 1)} className="p-1 hover:bg-slate-50 text-slate-400"><ChevronRight size={14} /></button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <label className="text-[10px] md:text-xs font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                          <Repeat size={14} className="text-emerald-500" /> Meses
+                        </label>
+                        <button type="button" onClick={selectAllMonths} className="text-[9px] md:text-xs font-black uppercase text-emerald-600 bg-white px-3 py-1 rounded-lg border border-slate-100 hover:bg-emerald-50 transition-colors">
+                          {selectedMonths.length === 12 ? 'Limpar' : 'Todos'}
                         </button>
-                      );
-                    })}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-6 gap-2">
+                      {MONTHS.map((m, idx) => {
+                        const isPast = transactionYear < new Date().getFullYear() || (transactionYear === new Date().getFullYear() && idx < new Date().getMonth());
+                        return (
+                          <button
+                            key={m} type="button" onClick={() => !isPast && toggleMonthSelection(idx)}
+                            disabled={isPast}
+                            className={`py-2 px-1 text-[9px] md:text-sm font-black rounded-lg border-2 transition-all ${isPast ? 'bg-slate-100 text-slate-300 border-transparent cursor-not-allowed' :
+                              selectedMonths.includes(idx) ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-transparent text-slate-400 hover:border-slate-200'
+                              }`}
+                          >
+                            {m.substring(0, 3)}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
