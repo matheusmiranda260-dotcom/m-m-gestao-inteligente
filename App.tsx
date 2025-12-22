@@ -38,7 +38,7 @@ import { api } from './services/api';
 
 // ... (imports remain the same, ensure 'api' is imported)
 
-import { Login } from './Login'; // Import the Login component
+import { Login } from './Login'; // Importar componente de Login
 
 // ... (imports remain the same, ensure 'api' is imported)
 
@@ -177,7 +177,7 @@ const App: React.FC = () => {
     const year = yearOverride || currentDate.getFullYear();
     setIsLoading(true);
 
-    // Create promises for all insertions
+    // Cria promises para todas as inserções
     const promises = targetMonths.map(m =>
       api.addCardTransaction({
         ...base,
@@ -186,29 +186,29 @@ const App: React.FC = () => {
     );
 
     await Promise.all(promises);
-    await fetchSafely(); // Refresh data
+    await fetchSafely(); // Atualizar dados
     setShowModal(null);
   };
 
-  // Intelligent wrapper for adding cards based on settings
+  // Wrapper inteligente para adicionar cartões com base nas configurações
   const handleSmartAddCard = async (base: Omit<CardTransaction, 'id'>, targetMonths: number[], yearOverride?: number) => {
     const providerSettings = appSettings.card_settings[base.provider];
-    const closeDay = providerSettings?.closeDay || 100; // default high to never trigger if missing
+    const closeDay = providerSettings?.closeDay || 100; // padrão alto para nunca acionar se faltar
 
-    // Check if CURRENT day is after close day
+    // Verifica se o dia ATUAL é após o fechamento
     const today = new Date();
     const isClosed = today.getDate() >= closeDay;
 
     let finalMonths = targetMonths;
     let finalYear = yearOverride || currentDate.getFullYear();
 
-    // If user didn't select specific months (auto mode) and card is closed, shift to next month
+    // Se o usuário não selecionou meses específicos (modo auto) e o cartão fechou, joga para o próximo
     if (targetMonths.length === 1 && targetMonths[0] === today.getMonth() && finalYear === today.getFullYear()) {
       if (isClosed) {
         const nextMonth = (today.getMonth() + 1) % 12;
         finalMonths = [nextMonth];
 
-        // Handle year rollover
+        // Lidar com virada de ano
         if (nextMonth === 0) {
           finalYear += 1;
         }
@@ -265,24 +265,24 @@ const App: React.FC = () => {
     }));
 
     const success = await api.updateFixedExpense(id, { isPaid: !expense.isPaid });
-    if (!success) fetchSafely(); // Revert on failure
+    if (!success) fetchSafely(); // Reverte se falhar
   };
 
   const updateFixedAmount = async (id: string, amount: number) => {
-    // Optimistic update
+    // Atualização otimista
     setData(prev => ({
       ...prev,
       fixedExpenses: prev.fixedExpenses.map(e => e.id === id ? { ...e, amount } : e)
     }));
 
-    // Debouncing could be added here, but for now direct update
+    // Debounce poderia ser adicionado aqui, mas atualização direta por enquanto
     await api.updateFixedExpense(id, { amount });
   };
 
   const deleteTransaction = async (type: 'card' | 'income' | 'fixed', id: string) => {
     if (!confirm('Excluir este registro?')) return;
 
-    // Optimistic delete
+    // Exclusão otimista
     setData(prev => {
       if (type === 'card') return { ...prev, cardTransactions: prev.cardTransactions.filter(t => t.id !== id) };
       if (type === 'income') return { ...prev, incomes: prev.incomes.filter(t => t.id !== id) };
@@ -311,7 +311,7 @@ const App: React.FC = () => {
     setEditingTransaction(item);
     setShowModal(type);
 
-    // Pre-fill categories/providers based on item data
+    // Preenche categorias/fornecedores com base nos dados do item
     if (type === TransactionType.FIXED_EXPENSE) {
       setFixedCategory(item.category);
     }
@@ -682,7 +682,7 @@ const App: React.FC = () => {
               const finalMonths = selectedMonths.length > 0 ? selectedMonths : [currentDate.getMonth()];
 
               if (editingTransaction) {
-                // EDIT MODE logic
+                // Lógica modo EDIÇÃO
                 if (showModal === TransactionType.INCOME) {
                   await api.updateIncome(editingTransaction.id, {
                     description: formDataObj.get('description') as string,
@@ -711,7 +711,7 @@ const App: React.FC = () => {
                 return;
               }
 
-              // CREATE MODE logic (existing)
+              // Lógica modo CRIAÇÃO (existente)
               if (showModal === TransactionType.CARD_EXPENSE) {
                 handleSmartAddCard({
                   description: formDataObj.get('description') as string, amount: val,
