@@ -237,6 +237,43 @@ export const api = {
             .eq('id', id);
 
         return !error;
+    },
+
+    getSettings: async () => {
+        const { data, error } = await supabase
+            .from('user_settings')
+            .select('*')
+            .single();
+
+        if (error || !data) {
+            // Tenta buscar qualquer um se single falhar ou cria default local
+            const { data: list } = await supabase.from('user_settings').select('*').limit(1);
+            return list && list.length > 0 ? list[0] : null;
+        }
+        return data;
+    },
+
+    updateSettings: async (settings: any) => {
+        // Verifica se existe ID
+        const current = await api.getSettings();
+        if (current) {
+            const { error } = await supabase
+                .from('user_settings')
+                .update({
+                    card_settings: settings.card_settings,
+                    category_settings: settings.category_settings
+                })
+                .eq('id', current.id);
+            return !error;
+        } else {
+            const { error } = await supabase
+                .from('user_settings')
+                .insert([{
+                    card_settings: settings.card_settings,
+                    category_settings: settings.category_settings
+                }]);
+            return !error;
+        }
     }
 };
 

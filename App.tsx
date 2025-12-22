@@ -30,7 +30,8 @@ import {
   Plus,
   Info,
   AlertCircle,
-  Edit2
+  Edit2,
+  Settings
 } from 'lucide-react';
 
 import { api } from './services/api';
@@ -60,12 +61,31 @@ const App: React.FC = () => {
     fixedExpenses: [],
     incomes: []
   });
+  const [appSettings, setAppSettings] = useState<any>({
+    card_settings: {
+      [CardProvider.SANTANDER]: { dueDay: 10, closeDay: 3 },
+      [CardProvider.MERCADO_LIVRE]: { dueDay: 8, closeDay: 1 }
+    },
+    category_settings: {
+      [FixedExpenseCategory.AGUA]: 5,
+      [FixedExpenseCategory.LUZ]: 10,
+      [FixedExpenseCategory.INTERNET_CASA]: 15,
+      [FixedExpenseCategory.INTERNET_CELULAR]: 15,
+      [FixedExpenseCategory.TERRENO]: 20,
+      [FixedExpenseCategory.TV]: 10
+    }
+  });
+  const [showSettings, setShowSettings] = useState(false);
 
   const fetchSafely = async () => {
     setIsLoading(true);
-    const result = await api.fetchData();
-    if (result) {
-      setData(result);
+    const [result, settings] = await Promise.all([api.fetchData(), api.getSettings()]);
+    if (result) setData(result);
+    if (settings) {
+      setAppSettings({
+        card_settings: settings.card_settings || appSettings.card_settings,
+        category_settings: settings.category_settings || appSettings.category_settings
+      });
     }
     setIsLoading(false);
   };
@@ -165,6 +185,29 @@ const App: React.FC = () => {
     await Promise.all(promises);
     await fetchSafely(); // Refresh data
     setShowModal(null);
+  };
+
+  // Intelligent wrapper for adding cards based on settings
+  const handleSmartAddCard = async (base: Omit<CardTransaction, 'id'>, targetMonths: number[]) => {
+    const providerSettings = appSettings.card_settings[base.provider];
+    const closeDay = providerSettings?.closeDay || 100; // default high to never trigger if missing
+
+    // Check if CURRENT day is after close day
+    const today = new Date();
+    const isClosed = today.getDate() >= closeDay;
+
+    let finalMonths = targetMonths;
+
+    // If user didn't select specific months (auto mode) and card is closed, shift to next month
+    if (targetMonths.length === 1 && targetMonths[0] === today.getMonth()) {
+      if (isClosed) {
+        const nextMonth = (today.getMonth() + 1) % 12;
+        finalMonths = [nextMonth];
+        alert(`Cartão virou! Lançamento jogado para o próximo mês (Fatura fecha dia ${closeDay}).`);
+      }
+    }
+
+    await handleAddCardTransaction(base, finalMonths);
   };
 
   const handleAddIncome = async (base: Omit<Income, 'id'>, targetMonths: number[]) => {
@@ -287,21 +330,31 @@ const App: React.FC = () => {
       {/* HEADER COMPACTO PARA MOBILE - REMOVIDO "PREMIUM FINANCE" */}
       <header className="bg-slate-900 text-white p-3 md:p-6 shadow-xl rounded-b-[1.5rem] sticky top-0 z-30">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 md:w-12 md:h-12 bg-emerald-500 rounded-lg md:rounded-2xl flex items-center justify-center shadow-lg rotate-3">
-              <span className="text-xs md:text-base font-black italic tracking-tighter text-slate-900">M$M</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] md:text-lg font-black tracking-tighter leading-none">GESTÃO INTELIGENTE</span>
+          <div className="flex justify-between items-center w-full md:w-auto">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 md:w-12 md:h-12 bg-emerald-500 rounded-lg md:rounded-2xl flex items-center justify-center shadow-lg rotate-3">
+                <span className="text-xs md:text-base font-black italic tracking-tighter text-slate-900">M$M</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] md:text-lg font-black tracking-tighter leading-none">GESTÃO INTELIGENTE</span>
+              </div>
             </div>
           </div>
-          <button
-            onClick={generateInsights} disabled={loadingAi}
-            className="bg-emerald-500 hover:bg-emerald-400 text-slate-900 p-1.5 md:p-3 rounded-lg md:rounded-xl transition-all flex items-center gap-2 px-3 md:px-5 shadow-lg active:scale-95"
-          >
-            <BrainCircuit size={14} className="md:w-5 md:h-5" />
-            <span className="text-[9px] md:text-sm font-black uppercase tracking-wider">{loadingAi ? '...' : 'Insights'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowSettings(true)}
+              className="bg-slate-800 text-slate-400 hover:text-white p-2 md:p-3 rounded-lg md:rounded-xl transition-all"
+            >
+              <Settings size={16} className="md:w-6 md:h-6" />
+            </button>
+            <button
+              onClick={generateInsights} disabled={loadingAi}
+              className="bg-emerald-500 hover:bg-emerald-400 text-slate-900 p-1.5 md:p-3 rounded-lg md:rounded-xl transition-all flex items-center gap-2 px-3 md:px-5 shadow-lg active:scale-95"
+            >
+              <BrainCircuit size={14} className="md:w-5 md:h-5" />
+              <span className="text-[9px] md:text-sm font-black uppercase tracking-wider">{loadingAi ? '...' : 'Insights'}</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -385,6 +438,101 @@ const App: React.FC = () => {
           </div>
         )}
       </main>
+
+      {/* CONFIGURAÇÕES MODAL */}
+      {showSettings && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-900 text-white">
+              <h3 className="text-xl font-black flex items-center gap-2"><Settings className="text-emerald-500" /> Configurações</h3>
+              <button onClick={() => setShowSettings(false)}><X className="text-slate-400 hover:text-white" /></button>
+            </div>
+            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+              {/* Cartões */}
+              <div>
+                <h4 className="font-black text-slate-900 mb-3 flex items-center gap-2 uppercase tracking-wider text-xs"><CreditCard size={14} className="text-orange-500" /> Cartões de Crédito</h4>
+                <div className="space-y-3">
+                  {Object.values(CardProvider).map(provider => (
+                    <div key={provider} className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                      <div className="text-sm font-bold text-slate-800 mb-2">{provider}</div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-[10px] uppercase font-bold text-slate-400">Dia Fechamento</label>
+                          <input
+                            type="number" min="1" max="31"
+                            value={appSettings.card_settings[provider]?.closeDay || 1}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value);
+                              setAppSettings(prev => ({
+                                ...prev,
+                                card_settings: { ...prev.card_settings, [provider]: { ...prev.card_settings[provider], closeDay: val } }
+                              }));
+                            }}
+                            className="w-full p-2 rounded-lg border border-slate-200 font-bold"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase font-bold text-slate-400">Dia Vencimento</label>
+                          <input
+                            type="number" min="1" max="31"
+                            value={appSettings.card_settings[provider]?.dueDay || 10}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value);
+                              setAppSettings(prev => ({
+                                ...prev,
+                                card_settings: { ...prev.card_settings, [provider]: { ...prev.card_settings[provider], dueDay: val } }
+                              }));
+                            }}
+                            className="w-full p-2 rounded-lg border border-slate-200 font-bold"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fixas Default */}
+              <div>
+                <h4 className="font-black text-slate-900 mb-3 flex items-center gap-2 uppercase tracking-wider text-xs"><Calendar size={14} className="text-emerald-500" /> Vencimentos Padrão</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {Object.values(FixedExpenseCategory).filter(c => c !== FixedExpenseCategory.OUTROS).map(cat => (
+                    <div key={cat} className="p-2 bg-slate-50 rounded-lg flex justify-between items-center">
+                      <span className="text-xs font-bold text-slate-700">{cat}</span>
+                      <input
+                        type="number" min="1" max="31"
+                        value={appSettings.category_settings[cat] || 15}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          setAppSettings(prev => ({
+                            ...prev,
+                            category_settings: { ...prev.category_settings, [cat]: val }
+                          }));
+                        }}
+                        className="w-12 p-1 text-center rounded-md border border-slate-200 font-bold text-xs"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border-t border-slate-100 bg-slate-50">
+              <button
+                onClick={async () => {
+                  setIsLoading(true);
+                  await api.updateSettings(appSettings);
+                  setIsLoading(false);
+                  setShowSettings(false);
+                  alert('Configurações salvas!');
+                }}
+                className="w-full py-3 bg-slate-900 text-white font-black rounded-xl hover:bg-emerald-600 transition-all shadow-lg"
+              >
+                Salvar Configurações
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL DE DETALHES - AUMENTADO PARA DESKTOP */}
       {selectedDetails && (
@@ -555,7 +703,7 @@ const App: React.FC = () => {
 
               // CREATE MODE logic (existing)
               if (showModal === TransactionType.CARD_EXPENSE) {
-                handleAddCardTransaction({
+                handleSmartAddCard({
                   description: formDataObj.get('description') as string, amount: val,
                   provider: formDataObj.get('provider') as CardProvider,
                   totalInstallments: parseInt(formDataObj.get('totalInstallments') as string) || 1,
@@ -612,7 +760,13 @@ const App: React.FC = () => {
                 ) : (
                   <div className="space-y-2">
                     <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Vencimento</label>
-                    <input required name="dueDate" defaultValue={editingTransaction?.dueDate} type="number" min="1" max="31" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-base md:text-xl font-black" />
+                    <input
+                      required
+                      name="dueDate"
+                      defaultValue={editingTransaction?.dueDate || (appSettings.category_settings[fixedCategory] ? appSettings.category_settings[fixedCategory] : 10)}
+                      type="number" min="1" max="31"
+                      className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-base md:text-xl font-black"
+                    />
                   </div>
                 )}
               </div>
