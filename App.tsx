@@ -754,21 +754,23 @@ const App: React.FC = () => {
               }
             }} className="space-y-6">
 
-              <div className="space-y-2">
-                <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Identificação</label>
-                {showModal === TransactionType.FIXED_EXPENSE ? (
-                  <div className="space-y-4">
-                    <select required name="category" defaultValue={editingTransaction?.category} onChange={(e) => setFixedCategory(e.target.value as FixedExpenseCategory)} className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-sm md:text-lg">
-                      {Object.values(FixedExpenseCategory).map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                    </select>
-                    {fixedCategory === FixedExpenseCategory.OUTROS && (
-                      <input required name="customName" defaultValue={editingTransaction?.name} placeholder="Título" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm md:text-lg font-bold" />
-                    )}
-                  </div>
-                ) : (
-                  <input required={showModal !== TransactionType.INCOME} defaultValue={editingTransaction?.description} placeholder="Ex: Amazon, Mercado..." name="description" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm md:text-lg font-bold" />
-                )}
-              </div>
+              {showModal !== TransactionType.CARD_EXPENSE && (
+                <div className="space-y-2">
+                  <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Identificação</label>
+                  {showModal === TransactionType.FIXED_EXPENSE ? (
+                    <div className="space-y-4">
+                      <select required name="category" defaultValue={editingTransaction?.category} onChange={(e) => setFixedCategory(e.target.value as FixedExpenseCategory)} className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-sm md:text-lg">
+                        {Object.values(FixedExpenseCategory).map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                      </select>
+                      {fixedCategory === FixedExpenseCategory.OUTROS && (
+                        <input required name="customName" defaultValue={editingTransaction?.name} placeholder="Título" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm md:text-lg font-bold" />
+                      )}
+                    </div>
+                  ) : (
+                    <input required={false} defaultValue={editingTransaction?.description} placeholder="Descrição (Opcional)" name="description" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm md:text-lg font-bold" />
+                  )}
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
