@@ -29,7 +29,8 @@ import {
   Repeat,
   Plus,
   Info,
-  AlertCircle
+  AlertCircle,
+  Edit2
 } from 'lucide-react';
 
 import { api } from './services/api';
@@ -50,6 +51,7 @@ const App: React.FC = () => {
   const [aiInsight, setAiInsight] = useState<string>('');
   const [loadingAi, setLoadingAi] = useState(false);
   const [showModal, setShowModal] = useState<TransactionType | null>(null);
+  const [editingTransaction, setEditingTransaction] = useState<any | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -81,7 +83,10 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!showModal) setSelectedMonths([]);
+    if (!showModal) {
+      setSelectedMonths([]);
+      setEditingTransaction(null);
+    }
   }, [showModal]);
 
   const yearlySummary = useMemo(() => {
@@ -237,6 +242,16 @@ const App: React.FC = () => {
     const insight = await getFinancialInsights(data);
     setAiInsight(insight);
     setLoadingAi(false);
+  };
+
+  const handleEditTransaction = (item: any, type: TransactionType) => {
+    setEditingTransaction(item);
+    setShowModal(type);
+
+    // Pre-fill categories/providers based on item data
+    if (type === TransactionType.FIXED_EXPENSE) {
+      setFixedCategory(item.category);
+    }
   };
 
   const toggleMonthSelection = (m: number) => {
@@ -415,6 +430,7 @@ const App: React.FC = () => {
                             className="w-16 md:w-24 bg-transparent text-right font-black text-[10px] md:text-base focus:outline-none border-b border-transparent focus:border-emerald-500 transition-all"
                           />
                           <button onClick={() => deleteTransaction('fixed', expense.id)} className="text-slate-300 hover:text-red-500 p-1"><Trash2 size={16} className="md:w-5 md:h-5" /></button>
+                          <button onClick={() => handleEditTransaction(expense, TransactionType.FIXED_EXPENSE)} className="text-slate-300 hover:text-emerald-500 p-1"><Edit2 size={16} className="md:w-5 md:h-5" /></button>
                         </div>
                       </div>
                     ))}
@@ -434,6 +450,7 @@ const App: React.FC = () => {
                         <div className="flex items-center gap-3">
                           <span className="font-black text-[10px] md:text-base text-slate-900">R$ {income.amount.toFixed(2)}</span>
                           <button onClick={() => deleteTransaction('income', income.id)} className="text-emerald-400 hover:text-red-500 p-1"><Trash2 size={16} className="md:w-5 md:h-5" /></button>
+                          <button onClick={() => handleEditTransaction(income, TransactionType.INCOME)} className="text-emerald-400 hover:text-emerald-600 p-1"><Edit2 size={16} className="md:w-5 md:h-5" /></button>
                         </div>
                       </div>
                     ))}
@@ -452,17 +469,48 @@ const App: React.FC = () => {
             <button onClick={() => setShowModal(null)} className="absolute top-6 right-6 text-slate-300 hover:text-slate-600"><X size={32} /></button>
 
             <h3 className="text-xl md:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3 mb-8">
-              {showModal === TransactionType.CARD_EXPENSE && <><CreditCard className="text-orange-500 md:w-8 md:h-8" /> Lançar Cartão</>}
-              {showModal === TransactionType.INCOME && <><TrendingUp className="text-emerald-600 md:w-8 md:h-8" /> Nova Entrada</>}
-              {showModal === TransactionType.FIXED_EXPENSE && <><Calendar className="text-slate-900 md:w-8 md:h-8" /> Conta Fixa</>}
+              {showModal === TransactionType.CARD_EXPENSE && <><CreditCard className="text-orange-500 md:w-8 md:h-8" /> {editingTransaction ? 'Editar Cartão' : 'Lançar Cartão'}</>}
+              {showModal === TransactionType.INCOME && <><TrendingUp className="text-emerald-600 md:w-8 md:h-8" /> {editingTransaction ? 'Editar Entrada' : 'Nova Entrada'}</>}
+              {showModal === TransactionType.FIXED_EXPENSE && <><Calendar className="text-slate-900 md:w-8 md:h-8" /> {editingTransaction ? 'Editar Conta' : 'Conta Fixa'}</>}
             </h3>
 
-            <form onSubmit={(e) => {
+            <form onSubmit={async (e) => {
               e.preventDefault();
               const formDataObj = new FormData(e.currentTarget);
               const val = parseFloat(formDataObj.get('amount') as string);
               const finalMonths = selectedMonths.length > 0 ? selectedMonths : [currentDate.getMonth()];
 
+              if (editingTransaction) {
+                // EDIT MODE logic
+                if (showModal === TransactionType.INCOME) {
+                  await api.updateIncome(editingTransaction.id, {
+                    description: formDataObj.get('description') as string,
+                    amount: val,
+                    source: formDataObj.get('source') as IncomeSource
+                  });
+                } else if (showModal === TransactionType.FIXED_EXPENSE) {
+                  const category = formDataObj.get('category') as FixedExpenseCategory;
+                  await api.updateFixedExpense(editingTransaction.id, {
+                    name: category === FixedExpenseCategory.OUTROS ? formDataObj.get('customName') as string : category,
+                    amount: val,
+                    dueDate: formDataObj.get('dueDate') as string,
+                    category
+                  });
+                } else if (showModal === TransactionType.CARD_EXPENSE) {
+                  await api.updateCardTransaction(editingTransaction.id, {
+                    description: formDataObj.get('description') as string,
+                    amount: val,
+                    provider: formDataObj.get('provider') as CardProvider,
+                    totalInstallments: parseInt(formDataObj.get('totalInstallments') as string) || 1
+                  });
+                }
+                await fetchSafely();
+                setShowModal(null);
+                setEditingTransaction(null);
+                return;
+              }
+
+              // CREATE MODE logic (existing)
               if (showModal === TransactionType.CARD_EXPENSE) {
                 handleAddCardTransaction({
                   description: formDataObj.get('description') as string, amount: val,
@@ -489,75 +537,77 @@ const App: React.FC = () => {
                 <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Identificação</label>
                 {showModal === TransactionType.FIXED_EXPENSE ? (
                   <div className="space-y-4">
-                    <select required name="category" onChange={(e) => setFixedCategory(e.target.value as FixedExpenseCategory)} className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-sm md:text-lg">
+                    <select required name="category" defaultValue={editingTransaction?.category} onChange={(e) => setFixedCategory(e.target.value as FixedExpenseCategory)} className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-sm md:text-lg">
                       {Object.values(FixedExpenseCategory).map(cat => <option key={cat} value={cat}>{cat}</option>)}
                     </select>
                     {fixedCategory === FixedExpenseCategory.OUTROS && (
-                      <input required name="customName" placeholder="Título" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm md:text-lg font-bold" />
+                      <input required name="customName" defaultValue={editingTransaction?.name} placeholder="Título" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm md:text-lg font-bold" />
                     )}
                   </div>
                 ) : (
-                  <input required={showModal !== TransactionType.INCOME} placeholder="Ex: Amazon, Mercado..." name="description" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm md:text-lg font-bold" />
+                  <input required={showModal !== TransactionType.INCOME} defaultValue={editingTransaction?.description} placeholder="Ex: Amazon, Mercado..." name="description" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm md:text-lg font-bold" />
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Valor</label>
-                  <input required name="amount" type="number" step="0.01" placeholder="0,00" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-base md:text-xl font-black" />
+                  <input required name="amount" defaultValue={editingTransaction?.amount} type="number" step="0.01" placeholder="0,00" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-base md:text-xl font-black" />
                 </div>
                 {showModal === TransactionType.CARD_EXPENSE ? (
                   <div className="space-y-2">
                     <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Parcelas</label>
-                    <input required name="totalInstallments" type="number" defaultValue="1" min="1" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-base md:text-xl font-black" />
+                    <input required name="totalInstallments" defaultValue={editingTransaction?.totalInstallments} type="number" min="1" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-base md:text-xl font-black" />
                   </div>
                 ) : showModal === TransactionType.INCOME ? (
                   <div className="space-y-2">
                     <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Fonte</label>
-                    <select required name="source" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-xs md:text-base">
+                    <select required name="source" defaultValue={editingTransaction?.source} className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-xs md:text-base">
                       {Object.values(IncomeSource).map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Vencimento</label>
-                    <input required name="dueDate" type="number" min="1" max="31" defaultValue="1" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-base md:text-xl font-black" />
+                    <input required name="dueDate" defaultValue={editingTransaction?.dueDate} type="number" min="1" max="31" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-base md:text-xl font-black" />
                   </div>
                 )}
               </div>
 
-              {/* REPETIÇÃO COMPACTADA */}
-              <div className="space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="flex justify-between items-center">
-                  <label className="text-[10px] md:text-xs font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
-                    <Repeat size={14} className="text-emerald-500" /> Meses
-                  </label>
-                  <button type="button" onClick={selectAllMonths} className="text-[9px] md:text-xs font-black uppercase text-emerald-600 bg-white px-3 py-1 rounded-lg border border-slate-100 hover:bg-emerald-50 transition-colors">
-                    {selectedMonths.length === 12 ? 'Reset' : 'Todos'}
-                  </button>
-                </div>
-                <div className="grid grid-cols-6 gap-2">
-                  {MONTHS.map((m, idx) => {
-                    const isPast = currentDate.getFullYear() === new Date().getFullYear() && idx < new Date().getMonth();
-                    return (
-                      <button
-                        key={m} type="button" onClick={() => !isPast && toggleMonthSelection(idx)}
-                        disabled={isPast}
-                        className={`py-2 px-1 text-[9px] md:text-sm font-black rounded-lg border-2 transition-all ${isPast ? 'bg-slate-100 text-slate-300 border-transparent cursor-not-allowed' :
+              {/* REPETIÇÃO COMPACTADA - Oculta na edição para evitar complexidade */}
+              {!editingTransaction && (
+                <div className="space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] md:text-xs font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                      <Repeat size={14} className="text-emerald-500" /> Meses
+                    </label>
+                    <button type="button" onClick={selectAllMonths} className="text-[9px] md:text-xs font-black uppercase text-emerald-600 bg-white px-3 py-1 rounded-lg border border-slate-100 hover:bg-emerald-50 transition-colors">
+                      {selectedMonths.length === 12 ? 'Reset' : 'Todos'}
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-6 gap-2">
+                    {MONTHS.map((m, idx) => {
+                      const isPast = currentDate.getFullYear() === new Date().getFullYear() && idx < new Date().getMonth();
+                      return (
+                        <button
+                          key={m} type="button" onClick={() => !isPast && toggleMonthSelection(idx)}
+                          disabled={isPast}
+                          className={`py-2 px-1 text-[9px] md:text-sm font-black rounded-lg border-2 transition-all ${isPast ? 'bg-slate-100 text-slate-300 border-transparent cursor-not-allowed' :
                             selectedMonths.includes(idx) ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-transparent text-slate-400 hover:border-slate-200'
-                          }`}
-                      >
-                        {m.substring(0, 3)}
-                      </button>
-                    );
-                  })}
+                            }`}
+                        >
+                          {m.substring(0, 3)}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {showModal === TransactionType.CARD_EXPENSE && (
                 <div className="space-y-2">
                   <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Cartão</label>
-                  <select required name="provider" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-sm md:text-lg">
+                  <select required name="provider" defaultValue={editingTransaction?.provider} className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-sm md:text-lg">
                     <option value={CardProvider.SANTANDER}>Santander</option>
                     <option value={CardProvider.MERCADO_LIVRE}>Mercado Livre</option>
                   </select>
@@ -565,7 +615,7 @@ const App: React.FC = () => {
               )}
 
               <button type="submit" className="w-full py-4 md:py-5 bg-slate-900 text-white font-black rounded-xl hover:bg-emerald-600 transition-all shadow-xl active:scale-[0.98] text-sm md:text-lg uppercase tracking-widest">
-                Confirmar Lançamento
+                {editingTransaction ? 'Salvar Alterações' : 'Confirmar Lançamento'}
               </button>
             </form>
           </div>
