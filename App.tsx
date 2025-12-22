@@ -177,13 +177,20 @@ const App: React.FC = () => {
     const year = yearOverride || currentDate.getFullYear();
     setIsLoading(true);
 
+    const providerSettings = appSettings.card_settings[base.provider];
+    const dueDay = providerSettings?.dueDay || 1;
+
     // Cria promises para todas as inserções
-    const promises = targetMonths.map(m =>
-      api.addCardTransaction({
+    const promises = targetMonths.map(m => {
+      // Garante que a data não pule para o próximo mês (ex: dia 31 em Fev)
+      const daysInMonth = new Date(year, m + 1, 0).getDate();
+      const finalDay = Math.min(dueDay, daysInMonth);
+
+      return api.addCardTransaction({
         ...base,
-        purchaseDate: new Date(year, m, 1).toISOString()
-      })
-    );
+        purchaseDate: new Date(year, m, finalDay).toISOString()
+      });
+    });
 
     await Promise.all(promises);
     await fetchSafely(); // Atualizar dados
