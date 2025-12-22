@@ -106,6 +106,8 @@ const App: React.FC = () => {
 
       let monthlyCardsSantander = 0;
       let monthlyCardsML = 0;
+      const filteredCards: any[] = [];
+
       data.cardTransactions.forEach(t => {
         const pDate = new Date(t.purchaseDate);
         const startMonthTotal = pDate.getMonth() + pDate.getFullYear() * 12;
@@ -113,6 +115,13 @@ const App: React.FC = () => {
         const diff = currentMonthTotal - startMonthTotal;
         if (diff >= 0 && diff < t.totalInstallments) {
           const installmentValue = (t.amount / t.totalInstallments);
+
+          filteredCards.push({
+            ...t,
+            currentInstallment: diff + 1,
+            installmentValue
+          });
+
           if (t.provider === CardProvider.SANTANDER) {
             monthlyCardsSantander += installmentValue;
           } else {
@@ -121,12 +130,13 @@ const App: React.FC = () => {
         }
       });
 
+
       const totalCards = monthlyCardsSantander + monthlyCardsML;
 
       return {
         monthIndex, monthName, income: monthlyIncomes, fixed: monthlyFixed,
         pendingFixed, cardsSantander: monthlyCardsSantander, cardsML: monthlyCardsML, cards: totalCards, balance: monthlyIncomes - (monthlyFixed + totalCards),
-        filteredFixed, filteredIncomes: data.incomes.filter(i => {
+        filteredFixed, filteredCards, filteredIncomes: data.incomes.filter(i => {
           const d = new Date(i.date);
           return d.getMonth() === monthIndex && d.getFullYear() === year;
         })
@@ -407,55 +417,88 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
-                {/* Contas Fixas */}
-                <div className="space-y-3 md:space-y-5">
-                  <h4 className="text-[9px] md:text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1"><Calendar size={14} className="text-emerald-500" /> Contas Periódicas</h4>
-                  <div className="space-y-2">
-                    {selectedDetails.filteredFixed.map(expense => (
-                      <div key={expense.id} className="flex items-center justify-between p-3 md:p-5 rounded-xl bg-white shadow-sm border border-slate-100 hover:shadow-md transition-all">
-                        <div className="flex items-center gap-3 md:gap-4">
-                          <button onClick={() => toggleFixedExpense(expense.id)} className="shrink-0 hover:scale-110 transition-transform">
-                            {expense.isPaid ? <CheckCircle className="text-emerald-500 md:w-6 md:h-6" size={24} /> : <Circle className="text-slate-200 md:w-6 md:h-6" size={24} />}
-                          </button>
-                          <div>
-                            <div className="font-bold text-[10px] md:text-base text-slate-800 leading-tight">{expense.name}</div>
-                            <div className="text-[7px] md:text-[10px] text-slate-400 font-bold uppercase mt-0.5">Dia {expense.dueDate}</div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="number" value={expense.amount || ''} placeholder="0.00"
-                            onChange={(e) => updateFixedAmount(expense.id, parseFloat(e.target.value) || 0)}
-                            className="w-16 md:w-24 bg-transparent text-right font-black text-[10px] md:text-base focus:outline-none border-b border-transparent focus:border-emerald-500 transition-all"
-                          />
-                          <button onClick={() => deleteTransaction('fixed', expense.id)} className="text-slate-300 hover:text-red-500 p-1"><Trash2 size={16} className="md:w-5 md:h-5" /></button>
-                          <button onClick={() => handleEditTransaction(expense, TransactionType.FIXED_EXPENSE)} className="text-slate-300 hover:text-emerald-500 p-1"><Edit2 size={16} className="md:w-5 md:h-5" /></button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
 
                 {/* Entradas */}
                 <div className="space-y-3 md:space-y-5">
                   <h4 className="text-[9px] md:text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1"><TrendingUp size={14} className="text-emerald-500" /> Entradas (+)</h4>
                   <div className="space-y-2">
                     {selectedDetails.filteredIncomes.map(income => (
-                      <div key={income.id} className="flex justify-between items-center p-3 md:p-5 rounded-xl bg-emerald-50/40 border border-emerald-100 hover:bg-emerald-50 transition-all">
+                      <div key={income.id} className="flex justify-between items-center p-3 md:p-4 rounded-xl bg-emerald-50/40 border border-emerald-100 hover:bg-emerald-50 transition-all">
                         <div>
                           <div className="text-[7px] md:text-[10px] text-emerald-600 font-black uppercase mb-0.5">{income.source}</div>
-                          <div className="font-bold text-[10px] md:text-base text-slate-800 leading-tight">{income.description || 'Receita'}</div>
+                          <div className="font-bold text-[10px] md:text-sm text-slate-800 leading-tight">{income.description || 'Receita'}</div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <span className="font-black text-[10px] md:text-base text-slate-900">R$ {income.amount.toFixed(2)}</span>
-                          <button onClick={() => deleteTransaction('income', income.id)} className="text-emerald-400 hover:text-red-500 p-1"><Trash2 size={16} className="md:w-5 md:h-5" /></button>
-                          <button onClick={() => handleEditTransaction(income, TransactionType.INCOME)} className="text-emerald-400 hover:text-emerald-600 p-1"><Edit2 size={16} className="md:w-5 md:h-5" /></button>
+                        <div className="flex items-center gap-2">
+                          <span className="font-black text-[10px] md:text-sm text-slate-900">R$ {income.amount.toFixed(2)}</span>
+                          <div className="flex">
+                            <button onClick={() => handleEditTransaction(income, TransactionType.INCOME)} className="text-emerald-400 hover:text-emerald-600 p-1"><Edit2 size={14} className="md:w-4 md:h-4" /></button>
+                            <button onClick={() => deleteTransaction('income', income.id)} className="text-emerald-400 hover:text-red-500 p-1"><Trash2 size={14} className="md:w-4 md:h-4" /></button>
+                          </div>
                         </div>
                       </div>
                     ))}
+                    {selectedDetails.filteredIncomes.length === 0 && <div className="text-center p-4 text-slate-300 text-xs italic">Nenhuma entrada</div>}
                   </div>
                 </div>
+
+                {/* Contas Fixas */}
+                <div className="space-y-3 md:space-y-5">
+                  <h4 className="text-[9px] md:text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1"><Calendar size={14} className="text-red-400" /> Fixas (-)</h4>
+                  <div className="space-y-2">
+                    {selectedDetails.filteredFixed.map(expense => (
+                      <div key={expense.id} className="flex items-center justify-between p-3 md:p-4 rounded-xl bg-white shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                        <div className="flex items-center gap-2 md:gap-3 overflow-hidden">
+                          <button onClick={() => toggleFixedExpense(expense.id)} className="shrink-0 hover:scale-110 transition-transform">
+                            {expense.isPaid ? <CheckCircle className="text-emerald-500 md:w-5 md:h-5" size={20} /> : <Circle className="text-slate-200 md:w-5 md:h-5" size={20} />}
+                          </button>
+                          <div className="min-w-0">
+                            <div className="font-bold text-[10px] md:text-sm text-slate-800 leading-tight truncate">{expense.name}</div>
+                            <div className="text-[7px] md:text-[9px] text-slate-400 font-bold uppercase mt-0.5">Venc. {expense.dueDate}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number" value={expense.amount || ''} placeholder="0.00"
+                            onChange={(e) => updateFixedAmount(expense.id, parseFloat(e.target.value) || 0)}
+                            className="w-14 md:w-20 bg-transparent text-right font-black text-[10px] md:text-sm focus:outline-none border-b border-transparent focus:border-emerald-500 transition-all"
+                          />
+                          <div className="flex shrink-0">
+                            <button onClick={() => handleEditTransaction(expense, TransactionType.FIXED_EXPENSE)} className="text-slate-300 hover:text-emerald-500 p-1"><Edit2 size={14} className="md:w-4 md:h-4" /></button>
+                            <button onClick={() => deleteTransaction('fixed', expense.id)} className="text-slate-300 hover:text-red-500 p-1"><Trash2 size={14} className="md:w-4 md:h-4" /></button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {selectedDetails.filteredFixed.length === 0 && <div className="text-center p-4 text-slate-300 text-xs italic">Nenhuma conta fixa</div>}
+                  </div>
+                </div>
+
+                {/* Cartões - NOVA COLUNA */}
+                <div className="space-y-3 md:space-y-5">
+                  <h4 className="text-[9px] md:text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1"><CreditCard size={14} className="text-orange-500" /> Cartões (-)</h4>
+                  <div className="space-y-2">
+                    {selectedDetails.filteredCards.map(card => (
+                      <div key={card.id} className="flex justify-between items-center p-3 md:p-4 rounded-xl bg-orange-50/30 border border-orange-100 hover:bg-orange-50 transition-all">
+                        <div className="overflow-hidden">
+                          <div className={`text-[7px] md:text-[9px] font-black uppercase mb-0.5 ${card.provider === 'Santander' ? 'text-orange-600' : 'text-yellow-600'}`}>
+                            {card.provider} <span className="text-slate-400">• {card.currentInstallment}/{card.totalInstallments}</span>
+                          </div>
+                          <div className="font-bold text-[10px] md:text-sm text-slate-800 leading-tight truncate">{card.description}</div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="font-black text-[10px] md:text-sm text-slate-900">R$ {card.installmentValue.toFixed(2)}</span>
+                          <div className="flex">
+                            <button onClick={() => handleEditTransaction(card, TransactionType.CARD_EXPENSE)} className="text-orange-300 hover:text-orange-600 p-1"><Edit2 size={14} className="md:w-4 md:h-4" /></button>
+                            <button onClick={() => deleteTransaction('card', card.id)} className="text-orange-300 hover:text-red-500 p-1"><Trash2 size={14} className="md:w-4 md:h-4" /></button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {selectedDetails.filteredCards.length === 0 && <div className="text-center p-4 text-slate-300 text-xs italic">Nenhuma fatura</div>}
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
