@@ -174,57 +174,70 @@ const App: React.FC = () => {
   };
 
   const handleAddCardTransaction = async (base: Omit<CardTransaction, 'id'>, targetMonths: number[], yearOverride?: number) => {
-    const year = yearOverride || currentDate.getFullYear();
-    setIsLoading(true);
+    try {
+      const year = yearOverride || currentDate.getFullYear();
+      setIsLoading(true);
 
-    const providerSettings = appSettings.card_settings[base.provider];
-    const dueDay = providerSettings?.dueDay || 1;
+      // Proteção contra configurações ausentes
+      const providerSettings = appSettings?.card_settings?.[base.provider];
+      const dueDay = providerSettings?.dueDay || 1;
 
-    // Cria promises para todas as inserções
-    const promises = targetMonths.map(m => {
-      // Garante que a data não pule para o próximo mês (ex: dia 31 em Fev)
-      const daysInMonth = new Date(year, m + 1, 0).getDate();
-      const finalDay = Math.min(dueDay, daysInMonth);
+      // Cria promises para todas as inserções
+      const promises = targetMonths.map(m => {
+        // Garante que a data não pule para o próximo mês (ex: dia 31 em Fev)
+        const daysInMonth = new Date(year, m + 1, 0).getDate();
+        const finalDay = Math.min(dueDay, daysInMonth);
 
-      return api.addCardTransaction({
-        ...base,
-        purchaseDate: new Date(year, m, finalDay).toISOString()
+        return api.addCardTransaction({
+          ...base,
+          purchaseDate: new Date(year, m, finalDay).toISOString()
+        });
       });
-    });
 
-    await Promise.all(promises);
-    await fetchSafely(); // Atualizar dados
-    setShowModal(null);
+      await Promise.all(promises);
+      await fetchSafely(); // Atualizar dados
+      setShowModal(null);
+    } catch (error) {
+      console.error("Erro ao adicionar transação:", error);
+      alert("Erro ao adicionar transação. Verifique o console ou tente novamente.");
+      setIsLoading(false);
+    }
   };
 
   // Wrapper inteligente para adicionar cartões com base nas configurações
   const handleSmartAddCard = async (base: Omit<CardTransaction, 'id'>, targetMonths: number[], yearOverride?: number) => {
-    const providerSettings = appSettings.card_settings[base.provider];
-    const closeDay = providerSettings?.closeDay || 100; // padrão alto para nunca acionar se faltar
+    try {
+      const providerSettings = appSettings?.card_settings?.[base.provider];
+      // Se não tiver config, assume dia 100 para não virar (comportamento seguro)
+      const closeDay = providerSettings?.closeDay || 100;
 
-    // Verifica se o dia ATUAL é após o fechamento
-    const today = new Date();
-    const isClosed = today.getDate() >= closeDay;
+      // Verifica se o dia ATUAL é após o fechamento
+      const today = new Date();
+      const isClosed = today.getDate() >= closeDay;
 
-    let finalMonths = targetMonths;
-    let finalYear = yearOverride || currentDate.getFullYear();
+      let finalMonths = targetMonths;
+      let finalYear = yearOverride || currentDate.getFullYear();
 
-    // Se o usuário não selecionou meses específicos (modo auto) e o cartão fechou, joga para o próximo
-    if (targetMonths.length === 1 && targetMonths[0] === today.getMonth() && finalYear === today.getFullYear()) {
-      if (isClosed) {
-        const nextMonth = (today.getMonth() + 1) % 12;
-        finalMonths = [nextMonth];
+      // Se o usuário não selecionou meses específicos (modo auto) e o cartão fechou, joga para o próximo
+      if (targetMonths.length === 1 && targetMonths[0] === today.getMonth() && finalYear === today.getFullYear()) {
+        if (isClosed) {
+          const nextMonth = (today.getMonth() + 1) % 12;
+          finalMonths = [nextMonth];
 
-        // Lidar com virada de ano
-        if (nextMonth === 0) {
-          finalYear += 1;
+          // Lidar com virada de ano
+          if (nextMonth === 0) {
+            finalYear += 1;
+          }
+
+          alert(`Cartão virou! Lançamento jogado para o próximo mês (Fatura fecha dia ${closeDay}).`);
         }
-
-        alert(`Cartão virou! Lançamento jogado para o próximo mês (Fatura fecha dia ${closeDay}).`);
       }
-    }
 
-    await handleAddCardTransaction(base, finalMonths, finalYear);
+      await handleAddCardTransaction(base, finalMonths, finalYear);
+    } catch (error) {
+      console.error("Erro na lógica inteligente do cartão:", error);
+      alert("Erro ao processar regras do cartão.");
+    }
   };
 
   const handleAddIncome = async (base: Omit<Income, 'id'>, targetMonths: number[], yearOverride?: number) => {
