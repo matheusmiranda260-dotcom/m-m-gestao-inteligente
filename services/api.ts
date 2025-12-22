@@ -195,9 +195,44 @@ export const api = {
         const dbUpdates: any = {};
         if (updates.isPaid !== undefined) dbUpdates.is_paid = updates.isPaid;
         if (updates.amount !== undefined) dbUpdates.amount = updates.amount;
+        if (updates.name !== undefined) dbUpdates.name = updates.name;
+        if (updates.dueDate !== undefined) dbUpdates.due_date = updates.dueDate;
+        if (updates.category !== undefined) dbUpdates.category = updates.category;
 
         const { error } = await supabase
             .from('fixed_expenses')
+            .update(dbUpdates)
+            .eq('id', id);
+
+        return !error;
+    },
+
+    updateIncome: async (id: string, updates: Partial<Income>): Promise<boolean> => {
+        const dbUpdates: any = {};
+        if (updates.description !== undefined) dbUpdates.description = updates.description;
+        if (updates.amount !== undefined) dbUpdates.amount = updates.amount;
+        if (updates.source !== undefined) dbUpdates.source = updates.source;
+        if (updates.date !== undefined) dbUpdates.date = updates.date;
+
+        const { error } = await supabase
+            .from('incomes')
+            .update(dbUpdates)
+            .eq('id', id);
+
+        return !error;
+    },
+
+    updateCardTransaction: async (id: string, updates: Partial<CardTransaction>): Promise<boolean> => {
+        const dbUpdates: any = {};
+        if (updates.description !== undefined) dbUpdates.description = updates.description;
+        if (updates.amount !== undefined) dbUpdates.amount = updates.amount;
+        if (updates.provider !== undefined) dbUpdates.provider = updates.provider;
+        if (updates.totalInstallments !== undefined) dbUpdates.total_installments = updates.totalInstallments;
+        if (updates.remainingInstallments !== undefined) dbUpdates.remaining_installments = updates.remainingInstallments;
+        if (updates.purchaseDate !== undefined) dbUpdates.purchase_date = updates.purchaseDate;
+
+        const { error } = await supabase
+            .from('card_transactions')
             .update(dbUpdates)
             .eq('id', id);
 

@@ -99,20 +99,28 @@ const App: React.FC = () => {
       const monthlyFixed = filteredFixed.reduce((acc, e) => acc + e.amount, 0);
       const pendingFixed = filteredFixed.filter(e => !e.isPaid).reduce((acc, e) => acc + e.amount, 0);
 
-      let monthlyCards = 0;
+      let monthlyCardsSantander = 0;
+      let monthlyCardsML = 0;
       data.cardTransactions.forEach(t => {
         const pDate = new Date(t.purchaseDate);
         const startMonthTotal = pDate.getMonth() + pDate.getFullYear() * 12;
         const currentMonthTotal = monthIndex + year * 12;
         const diff = currentMonthTotal - startMonthTotal;
         if (diff >= 0 && diff < t.totalInstallments) {
-          monthlyCards += (t.amount / t.totalInstallments);
+          const installmentValue = (t.amount / t.totalInstallments);
+          if (t.provider === CardProvider.SANTANDER) {
+            monthlyCardsSantander += installmentValue;
+          } else {
+            monthlyCardsML += installmentValue;
+          }
         }
       });
 
+      const totalCards = monthlyCardsSantander + monthlyCardsML;
+
       return {
         monthIndex, monthName, income: monthlyIncomes, fixed: monthlyFixed,
-        pendingFixed, cards: monthlyCards, balance: monthlyIncomes - (monthlyFixed + monthlyCards),
+        pendingFixed, cardsSantander: monthlyCardsSantander, cardsML: monthlyCardsML, cards: totalCards, balance: monthlyIncomes - (monthlyFixed + totalCards),
         filteredFixed, filteredIncomes: data.incomes.filter(i => {
           const d = new Date(i.date);
           return d.getMonth() === monthIndex && d.getFullYear() === year;
@@ -292,23 +300,25 @@ const App: React.FC = () => {
             <table className="w-full text-left">
               <thead className="bg-slate-50/50 text-[10px] md:text-sm uppercase font-black text-slate-400 border-b border-slate-100">
                 <tr>
-                  <th className="px-8 py-5">Mês</th>
-                  <th className="px-8 py-5 text-emerald-600">Entrada</th>
-                  <th className="px-8 py-5 text-red-500">Fixas</th>
-                  <th className="px-8 py-5 text-orange-500">Cartão</th>
-                  <th className="px-8 py-5">Saldo</th>
-                  <th className="px-8 py-5 text-center">Ação</th>
+                  <th className="px-6 py-5">Mês</th>
+                  <th className="px-6 py-5 text-emerald-600">Entrada</th>
+                  <th className="px-6 py-5 text-red-500">Fixas</th>
+                  <th className="px-6 py-5 text-orange-600">Santander</th>
+                  <th className="px-6 py-5 text-yellow-500">ML</th>
+                  <th className="px-6 py-5">Saldo</th>
+                  <th className="px-6 py-5 text-center">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {yearlySummary.map(m => (
                   <tr key={m.monthIndex} className="hover:bg-emerald-50/30 transition-all text-sm md:text-base lg:text-lg group">
-                    <td className="px-8 py-5 font-bold capitalize text-slate-700">{m.monthName}</td>
-                    <td className="px-8 py-5 font-bold text-emerald-600">R$ {m.income.toFixed(2)}</td>
-                    <td className="px-8 py-5 text-slate-500 italic">R$ {m.fixed.toFixed(2)}</td>
-                    <td className="px-8 py-5 text-slate-500">R$ {m.cards.toFixed(2)}</td>
-                    <td className={`px-8 py-5 font-black ${m.balance >= 0 ? 'text-slate-800' : 'text-red-500'}`}>R$ {m.balance.toFixed(2)}</td>
-                    <td className="px-8 py-5 text-center">
+                    <td className="px-6 py-5 font-bold capitalize text-slate-700">{m.monthName}</td>
+                    <td className="px-6 py-5 font-bold text-emerald-600">R$ {m.income.toFixed(2)}</td>
+                    <td className="px-6 py-5 text-slate-500 italic">R$ {m.fixed.toFixed(2)}</td>
+                    <td className="px-6 py-5 text-orange-600 font-medium">R$ {m.cardsSantander.toFixed(2)}</td>
+                    <td className="px-6 py-5 text-yellow-600 font-medium">R$ {m.cardsML.toFixed(2)}</td>
+                    <td className={`px-6 py-5 font-black ${m.balance >= 0 ? 'text-slate-800' : 'text-red-500'}`}>R$ {m.balance.toFixed(2)}</td>
+                    <td className="px-6 py-5 text-center">
                       <button onClick={() => setShowDetailsModal(m.monthIndex)} className="p-2.5 text-emerald-600 bg-emerald-50/0 group-hover:bg-emerald-50 rounded-xl transition-all"><Eye size={20} /></button>
                     </td>
                   </tr>
@@ -527,14 +537,20 @@ const App: React.FC = () => {
                   </button>
                 </div>
                 <div className="grid grid-cols-6 gap-2">
-                  {MONTHS.map((m, idx) => (
-                    <button
-                      key={m} type="button" onClick={() => toggleMonthSelection(idx)}
-                      className={`py-2 px-1 text-[9px] md:text-sm font-black rounded-lg border-2 transition-all ${selectedMonths.includes(idx) ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-transparent text-slate-400 hover:border-slate-200'}`}
-                    >
-                      {m.substring(0, 3)}
-                    </button>
-                  ))}
+                  {MONTHS.map((m, idx) => {
+                    const isPast = currentDate.getFullYear() === new Date().getFullYear() && idx < new Date().getMonth();
+                    return (
+                      <button
+                        key={m} type="button" onClick={() => !isPast && toggleMonthSelection(idx)}
+                        disabled={isPast}
+                        className={`py-2 px-1 text-[9px] md:text-sm font-black rounded-lg border-2 transition-all ${isPast ? 'bg-slate-100 text-slate-300 border-transparent cursor-not-allowed' :
+                            selectedMonths.includes(idx) ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-transparent text-slate-400 hover:border-slate-200'
+                          }`}
+                      >
+                        {m.substring(0, 3)}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
