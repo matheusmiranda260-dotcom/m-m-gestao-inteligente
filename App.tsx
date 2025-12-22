@@ -36,7 +36,12 @@ import { api } from './services/api';
 
 // ... (imports remain the same, ensure 'api' is imported)
 
+import { Login } from './Login'; // Import the Login component
+
+// ... (imports remain the same, ensure 'api' is imported)
+
 const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [fixedCategory, setFixedCategory] = useState<FixedExpenseCategory>(FixedExpenseCategory.AGUA);
@@ -235,6 +240,10 @@ const App: React.FC = () => {
   };
 
   const selectedDetails = showDetailsModal !== null ? yearlySummary[showDetailsModal] : null;
+
+  if (!isAuthenticated) {
+    return <Login onLogin={() => setIsAuthenticated(true)} />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 pb-24 text-slate-900 overflow-x-hidden">
