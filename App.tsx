@@ -253,35 +253,35 @@ const App: React.FC = () => {
 
       {/* HEADER COMPACTO PARA MOBILE - REMOVIDO "PREMIUM FINANCE" */}
       <header className="bg-slate-900 text-white p-3 md:p-6 shadow-xl rounded-b-[1.5rem] sticky top-0 z-30">
-        <div className="max-w-5xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-500 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg rotate-3">
-              <span className="text-xs md:text-sm font-black italic tracking-tighter text-slate-900">M$M</span>
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 md:w-12 md:h-12 bg-emerald-500 rounded-lg md:rounded-2xl flex items-center justify-center shadow-lg rotate-3">
+              <span className="text-xs md:text-base font-black italic tracking-tighter text-slate-900">M$M</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] md:text-sm font-black tracking-tighter leading-none">GESTÃO INTELIGENTE</span>
+              <span className="text-[10px] md:text-lg font-black tracking-tighter leading-none">GESTÃO INTELIGENTE</span>
             </div>
           </div>
           <button
             onClick={generateInsights} disabled={loadingAi}
-            className="bg-emerald-500 hover:bg-emerald-400 text-slate-900 p-1.5 md:p-2 rounded-lg md:rounded-xl transition-all flex items-center gap-1 px-3 shadow-lg active:scale-95"
+            className="bg-emerald-500 hover:bg-emerald-400 text-slate-900 p-1.5 md:p-3 rounded-lg md:rounded-xl transition-all flex items-center gap-2 px-3 md:px-5 shadow-lg active:scale-95"
           >
-            <BrainCircuit size={14} />
-            <span className="text-[9px] md:text-[10px] font-black uppercase tracking-wider">{loadingAi ? '...' : 'Insights'}</span>
+            <BrainCircuit size={14} className="md:w-5 md:h-5" />
+            <span className="text-[9px] md:text-sm font-black uppercase tracking-wider">{loadingAi ? '...' : 'Insights'}</span>
           </button>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto p-2 md:p-4 space-y-3 md:space-y-4">
+      <main className="max-w-6xl mx-auto p-2 md:p-6 space-y-4 md:space-y-6">
         {/* NAVEGAÇÃO DE ANO REDUZIDA */}
-        <div className="flex justify-between items-center bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm border border-slate-100">
-          <h2 className="text-[9px] md:text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
-            <Calendar size={10} className="text-emerald-500" /> Fluxo {currentDate.getFullYear()}
+        <div className="flex justify-between items-center bg-white p-2 md:p-4 rounded-xl md:rounded-2xl shadow-sm border border-slate-100">
+          <h2 className="text-[9px] md:text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <Calendar size={10} className="text-emerald-500 md:w-4 md:h-4" /> Fluxo {currentDate.getFullYear()}
           </h2>
-          <div className="flex items-center gap-1.5 md:gap-2">
-            <button onClick={() => changeYear(-1)} className="p-1.5 md:p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-500"><ChevronLeft size={16} /></button>
-            <span className="text-xs md:text-sm font-black text-slate-800">{currentDate.getFullYear()}</span>
-            <button onClick={() => changeYear(1)} className="p-1.5 md:p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-500"><ChevronRight size={16} /></button>
+          <div className="flex items-center gap-1.5 md:gap-3">
+            <button onClick={() => changeYear(-1)} className="p-1.5 md:p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors"><ChevronLeft size={16} className="md:w-6 md:h-6" /></button>
+            <span className="text-xs md:text-xl font-black text-slate-800">{currentDate.getFullYear()}</span>
+            <button onClick={() => changeYear(1)} className="p-1.5 md:p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors"><ChevronRight size={16} className="md:w-6 md:h-6" /></button>
           </div>
         </div>
 
@@ -290,26 +290,26 @@ const App: React.FC = () => {
           {/* Versão Desktop */}
           <div className="hidden md:block bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden">
             <table className="w-full text-left">
-              <thead className="bg-slate-50/50 text-[10px] uppercase font-black text-slate-400 border-b border-slate-100">
+              <thead className="bg-slate-50/50 text-[10px] md:text-sm uppercase font-black text-slate-400 border-b border-slate-100">
                 <tr>
-                  <th className="px-6 py-4">Mês</th>
-                  <th className="px-6 py-4 text-emerald-600">Entrada</th>
-                  <th className="px-6 py-4 text-red-500">Fixas</th>
-                  <th className="px-6 py-4 text-orange-500">Cartão</th>
-                  <th className="px-6 py-4">Saldo</th>
-                  <th className="px-6 py-4 text-center">Ação</th>
+                  <th className="px-8 py-5">Mês</th>
+                  <th className="px-8 py-5 text-emerald-600">Entrada</th>
+                  <th className="px-8 py-5 text-red-500">Fixas</th>
+                  <th className="px-8 py-5 text-orange-500">Cartão</th>
+                  <th className="px-8 py-5">Saldo</th>
+                  <th className="px-8 py-5 text-center">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {yearlySummary.map(m => (
-                  <tr key={m.monthIndex} className="hover:bg-emerald-50/30 transition-all text-sm">
-                    <td className="px-6 py-4 font-bold capitalize">{m.monthName}</td>
-                    <td className="px-6 py-4 font-bold text-emerald-600">R$ {m.income.toFixed(2)}</td>
-                    <td className="px-6 py-4 text-slate-500 italic">R$ {m.fixed.toFixed(2)}</td>
-                    <td className="px-6 py-4 text-slate-500">R$ {m.cards.toFixed(2)}</td>
-                    <td className={`px-6 py-4 font-black ${m.balance >= 0 ? 'text-slate-800' : 'text-red-500'}`}>R$ {m.balance.toFixed(2)}</td>
-                    <td className="px-6 py-4 text-center">
-                      <button onClick={() => setShowDetailsModal(m.monthIndex)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"><Eye size={16} /></button>
+                  <tr key={m.monthIndex} className="hover:bg-emerald-50/30 transition-all text-sm md:text-base lg:text-lg group">
+                    <td className="px-8 py-5 font-bold capitalize text-slate-700">{m.monthName}</td>
+                    <td className="px-8 py-5 font-bold text-emerald-600">R$ {m.income.toFixed(2)}</td>
+                    <td className="px-8 py-5 text-slate-500 italic">R$ {m.fixed.toFixed(2)}</td>
+                    <td className="px-8 py-5 text-slate-500">R$ {m.cards.toFixed(2)}</td>
+                    <td className={`px-8 py-5 font-black ${m.balance >= 0 ? 'text-slate-800' : 'text-red-500'}`}>R$ {m.balance.toFixed(2)}</td>
+                    <td className="px-8 py-5 text-center">
+                      <button onClick={() => setShowDetailsModal(m.monthIndex)} className="p-2.5 text-emerald-600 bg-emerald-50/0 group-hover:bg-emerald-50 rounded-xl transition-all"><Eye size={20} /></button>
                     </td>
                   </tr>
                 ))}
@@ -343,68 +343,68 @@ const App: React.FC = () => {
         </section>
 
         {aiInsight && (
-          <div className="bg-slate-900 border-l-4 border-emerald-500 p-3 md:p-6 rounded-xl md:rounded-2xl relative shadow-xl animate-in fade-in slide-in-from-top-4">
-            <button onClick={() => setAiInsight('')} className="absolute top-3 right-3 text-slate-500"><X size={16} /></button>
-            <h3 className="text-white font-black text-[10px] md:text-sm mb-1.5 flex items-center gap-1.5"><BrainCircuit size={14} className="text-emerald-500" /> Análise AI</h3>
-            <div className="text-slate-300 text-[10px] leading-relaxed whitespace-pre-wrap">{aiInsight}</div>
+          <div className="bg-slate-900 border-l-4 border-emerald-500 p-3 md:p-8 rounded-xl md:rounded-3xl relative shadow-xl animate-in fade-in slide-in-from-top-4">
+            <button onClick={() => setAiInsight('')} className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><X size={20} /></button>
+            <h3 className="text-white font-black text-[10px] md:text-lg mb-2 flex items-center gap-2"><BrainCircuit size={20} className="text-emerald-500" /> Análise AI</h3>
+            <div className="text-slate-300 text-[10px] md:text-base leading-relaxed whitespace-pre-wrap">{aiInsight}</div>
           </div>
         )}
       </main>
 
-      {/* MODAL DE DETALHES - MAIS COMPACTO EM MOBILE */}
+      {/* MODAL DE DETALHES - AUMENTADO PARA DESKTOP */}
       {selectedDetails && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
-          <div className="bg-white rounded-t-3xl md:rounded-[3rem] w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl animate-in slide-in-from-bottom-10 md:zoom-in-95 duration-300">
+          <div className="bg-white rounded-t-3xl md:rounded-[3rem] w-full max-w-5xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl animate-in slide-in-from-bottom-10 md:zoom-in-95 duration-300">
             <div className="p-4 md:p-8 border-b border-slate-100 flex justify-between items-center bg-slate-900 text-white">
-              <div className="flex items-center gap-2 md:gap-3">
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-500 rounded-lg md:rounded-xl flex items-center justify-center text-slate-900 font-black text-base rotate-3">
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="w-8 h-8 md:w-14 md:h-14 bg-emerald-500 rounded-lg md:rounded-2xl flex items-center justify-center text-slate-900 font-black text-base md:text-2xl rotate-3">
                   {selectedDetails.monthName.charAt(0)}
                 </div>
-                <h3 className="text-lg md:text-xl font-black capitalize tracking-tight">{selectedDetails.monthName}</h3>
+                <h3 className="text-lg md:text-3xl font-black capitalize tracking-tight">{selectedDetails.monthName}</h3>
               </div>
-              <button onClick={() => setShowDetailsModal(null)} className="p-1.5 text-slate-400 hover:text-white"><X size={24} /></button>
+              <button onClick={() => setShowDetailsModal(null)} className="p-1.5 md:p-3 text-slate-400 hover:text-white transition-colors"><X size={24} className="md:w-8 md:h-8" /></button>
             </div>
 
-            <div className="overflow-y-auto p-4 md:p-10 space-y-4 md:space-y-8 custom-scrollbar bg-slate-50/20">
+            <div className="overflow-y-auto p-4 md:p-10 space-y-4 md:space-y-10 custom-scrollbar bg-slate-50/20">
               {/* Cards de Resumo */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-                <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100">
-                  <p className="text-[8px] font-black text-emerald-600 uppercase mb-0.5 tracking-widest">Entradas</p>
-                  <p className="text-xs font-black text-slate-900">R$ {selectedDetails.income.toFixed(2)}</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-6">
+                <div className="bg-white p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-slate-100">
+                  <p className="text-[8px] md:text-xs font-black text-emerald-600 uppercase mb-1 tracking-widest">Entradas</p>
+                  <p className="text-xs md:text-2xl font-black text-slate-900">R$ {selectedDetails.income.toFixed(2)}</p>
                 </div>
-                <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100">
-                  <p className="text-[8px] font-black text-orange-500 uppercase mb-0.5 tracking-widest">Cartões</p>
-                  <p className="text-xs font-black text-slate-900">R$ {selectedDetails.cards.toFixed(2)}</p>
+                <div className="bg-white p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-slate-100">
+                  <p className="text-[8px] md:text-xs font-black text-orange-500 uppercase mb-1 tracking-widest">Cartões</p>
+                  <p className="text-xs md:text-2xl font-black text-slate-900">R$ {selectedDetails.cards.toFixed(2)}</p>
                 </div>
-                <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 col-span-2 md:col-span-1">
-                  <p className="text-[8px] font-black text-red-500 uppercase mb-0.5 tracking-widest">Pendências</p>
-                  <p className="text-xs font-black text-slate-900">R$ {selectedDetails.pendingFixed.toFixed(2)}</p>
+                <div className="bg-white p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-slate-100 col-span-2 md:col-span-1">
+                  <p className="text-[8px] md:text-xs font-black text-red-500 uppercase mb-1 tracking-widest">Pendências</p>
+                  <p className="text-xs md:text-2xl font-black text-slate-900">R$ {selectedDetails.pendingFixed.toFixed(2)}</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
                 {/* Contas Fixas */}
-                <div className="space-y-3">
-                  <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 px-1"><Calendar size={10} className="text-emerald-500" /> Contas Periódicas</h4>
-                  <div className="space-y-1.5">
+                <div className="space-y-3 md:space-y-5">
+                  <h4 className="text-[9px] md:text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1"><Calendar size={14} className="text-emerald-500" /> Contas Periódicas</h4>
+                  <div className="space-y-2">
                     {selectedDetails.filteredFixed.map(expense => (
-                      <div key={expense.id} className="flex items-center justify-between p-3 rounded-xl bg-white shadow-sm border border-slate-100">
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => toggleFixedExpense(expense.id)} className="shrink-0">
-                            {expense.isPaid ? <CheckCircle className="text-emerald-500" size={20} /> : <Circle className="text-slate-200" size={20} />}
+                      <div key={expense.id} className="flex items-center justify-between p-3 md:p-5 rounded-xl bg-white shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                        <div className="flex items-center gap-3 md:gap-4">
+                          <button onClick={() => toggleFixedExpense(expense.id)} className="shrink-0 hover:scale-110 transition-transform">
+                            {expense.isPaid ? <CheckCircle className="text-emerald-500 md:w-6 md:h-6" size={24} /> : <Circle className="text-slate-200 md:w-6 md:h-6" size={24} />}
                           </button>
                           <div>
-                            <div className="font-bold text-[10px] text-slate-800 leading-tight">{expense.name}</div>
-                            <div className="text-[7px] text-slate-400 font-bold uppercase">Dia {expense.dueDate}</div>
+                            <div className="font-bold text-[10px] md:text-base text-slate-800 leading-tight">{expense.name}</div>
+                            <div className="text-[7px] md:text-[10px] text-slate-400 font-bold uppercase mt-0.5">Dia {expense.dueDate}</div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <input
                             type="number" value={expense.amount || ''} placeholder="0.00"
                             onChange={(e) => updateFixedAmount(expense.id, parseFloat(e.target.value) || 0)}
-                            className="w-12 bg-transparent text-right font-black text-[10px] focus:outline-none border-b border-transparent focus:border-emerald-500"
+                            className="w-16 md:w-24 bg-transparent text-right font-black text-[10px] md:text-base focus:outline-none border-b border-transparent focus:border-emerald-500 transition-all"
                           />
-                          <button onClick={() => deleteTransaction('fixed', expense.id)} className="text-slate-300 hover:text-red-500"><Trash2 size={14} /></button>
+                          <button onClick={() => deleteTransaction('fixed', expense.id)} className="text-slate-300 hover:text-red-500 p-1"><Trash2 size={16} className="md:w-5 md:h-5" /></button>
                         </div>
                       </div>
                     ))}
@@ -412,18 +412,18 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Entradas */}
-                <div className="space-y-3">
-                  <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 px-1"><TrendingUp size={10} className="text-emerald-500" /> Entradas (+)</h4>
-                  <div className="space-y-1.5">
+                <div className="space-y-3 md:space-y-5">
+                  <h4 className="text-[9px] md:text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1"><TrendingUp size={14} className="text-emerald-500" /> Entradas (+)</h4>
+                  <div className="space-y-2">
                     {selectedDetails.filteredIncomes.map(income => (
-                      <div key={income.id} className="flex justify-between items-center p-3 rounded-xl bg-emerald-50/40 border border-emerald-100">
+                      <div key={income.id} className="flex justify-between items-center p-3 md:p-5 rounded-xl bg-emerald-50/40 border border-emerald-100 hover:bg-emerald-50 transition-all">
                         <div>
-                          <div className="text-[7px] text-emerald-600 font-black uppercase mb-0.5">{income.source}</div>
-                          <div className="font-bold text-[10px] text-slate-800 leading-tight">{income.description || 'Receita'}</div>
+                          <div className="text-[7px] md:text-[10px] text-emerald-600 font-black uppercase mb-0.5">{income.source}</div>
+                          <div className="font-bold text-[10px] md:text-base text-slate-800 leading-tight">{income.description || 'Receita'}</div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-black text-[10px]">R$ {income.amount.toFixed(2)}</span>
-                          <button onClick={() => deleteTransaction('income', income.id)} className="text-emerald-400 hover:text-red-500"><Trash2 size={14} /></button>
+                        <div className="flex items-center gap-3">
+                          <span className="font-black text-[10px] md:text-base text-slate-900">R$ {income.amount.toFixed(2)}</span>
+                          <button onClick={() => deleteTransaction('income', income.id)} className="text-emerald-400 hover:text-red-500 p-1"><Trash2 size={16} className="md:w-5 md:h-5" /></button>
                         </div>
                       </div>
                     ))}
@@ -435,16 +435,16 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL DE LANÇAMENTO - REMOVIDO "M$M GESTÃO INTELIGENTE" DO RODAPÉ */}
+      {/* MODAL DE LANÇAMENTO */}
       {showModal && (
         <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center p-0 md:p-4 overflow-y-auto">
-          <div className="bg-white rounded-t-3xl md:rounded-[3rem] w-full max-w-lg p-5 md:p-10 relative shadow-2xl animate-in slide-in-from-bottom-10 md:zoom-in-95 duration-300 border-t-8 border-emerald-500 my-auto">
-            <button onClick={() => setShowModal(null)} className="absolute top-5 right-5 text-slate-300 hover:text-slate-600"><X size={28} /></button>
+          <div className="bg-white rounded-t-3xl md:rounded-[3rem] w-full max-w-2xl p-5 md:p-12 relative shadow-2xl animate-in slide-in-from-bottom-10 md:zoom-in-95 duration-300 border-t-8 border-emerald-500 my-auto">
+            <button onClick={() => setShowModal(null)} className="absolute top-6 right-6 text-slate-300 hover:text-slate-600"><X size={32} /></button>
 
-            <h3 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2 mb-5">
-              {showModal === TransactionType.CARD_EXPENSE && <><CreditCard className="text-orange-500" /> Lançar Cartão</>}
-              {showModal === TransactionType.INCOME && <><TrendingUp className="text-emerald-600" /> Nova Entrada</>}
-              {showModal === TransactionType.FIXED_EXPENSE && <><Calendar className="text-slate-900" /> Conta Fixa</>}
+            <h3 className="text-xl md:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3 mb-8">
+              {showModal === TransactionType.CARD_EXPENSE && <><CreditCard className="text-orange-500 md:w-8 md:h-8" /> Lançar Cartão</>}
+              {showModal === TransactionType.INCOME && <><TrendingUp className="text-emerald-600 md:w-8 md:h-8" /> Nova Entrada</>}
+              {showModal === TransactionType.FIXED_EXPENSE && <><Calendar className="text-slate-900 md:w-8 md:h-8" /> Conta Fixa</>}
             </h3>
 
             <form onSubmit={(e) => {
@@ -473,64 +473,64 @@ const App: React.FC = () => {
                   amount: val, dueDate: formDataObj.get('dueDate') as string
                 }, finalMonths);
               }
-            }} className="space-y-3">
+            }} className="space-y-6">
 
-              <div className="space-y-1">
-                <label className="text-[8px] font-black text-slate-400 uppercase ml-2 tracking-widest">Identificação</label>
+              <div className="space-y-2">
+                <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Identificação</label>
                 {showModal === TransactionType.FIXED_EXPENSE ? (
-                  <div className="space-y-2">
-                    <select required name="category" onChange={(e) => setFixedCategory(e.target.value as FixedExpenseCategory)} className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-xs">
+                  <div className="space-y-4">
+                    <select required name="category" onChange={(e) => setFixedCategory(e.target.value as FixedExpenseCategory)} className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-sm md:text-lg">
                       {Object.values(FixedExpenseCategory).map(cat => <option key={cat} value={cat}>{cat}</option>)}
                     </select>
                     {fixedCategory === FixedExpenseCategory.OUTROS && (
-                      <input required name="customName" placeholder="Título" className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-xs font-bold" />
+                      <input required name="customName" placeholder="Título" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm md:text-lg font-bold" />
                     )}
                   </div>
                 ) : (
-                  <input required={showModal !== TransactionType.INCOME} placeholder="Ex: Amazon, Mercado..." name="description" className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-xs font-bold" />
+                  <input required={showModal !== TransactionType.INCOME} placeholder="Ex: Amazon, Mercado..." name="description" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm md:text-lg font-bold" />
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1">
-                  <label className="text-[8px] font-black text-slate-400 uppercase ml-2 tracking-widest">Valor</label>
-                  <input required name="amount" type="number" step="0.01" placeholder="0,00" className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm font-black" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Valor</label>
+                  <input required name="amount" type="number" step="0.01" placeholder="0,00" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-base md:text-xl font-black" />
                 </div>
                 {showModal === TransactionType.CARD_EXPENSE ? (
-                  <div className="space-y-1">
-                    <label className="text-[8px] font-black text-slate-400 uppercase ml-2 tracking-widest">Parcelas</label>
-                    <input required name="totalInstallments" type="number" defaultValue="1" min="1" className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm font-black" />
+                  <div className="space-y-2">
+                    <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Parcelas</label>
+                    <input required name="totalInstallments" type="number" defaultValue="1" min="1" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-base md:text-xl font-black" />
                   </div>
                 ) : showModal === TransactionType.INCOME ? (
-                  <div className="space-y-1">
-                    <label className="text-[8px] font-black text-slate-400 uppercase ml-2 tracking-widest">Fonte</label>
-                    <select required name="source" className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-[10px]">
+                  <div className="space-y-2">
+                    <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Fonte</label>
+                    <select required name="source" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-xs md:text-base">
                       {Object.values(IncomeSource).map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                 ) : (
-                  <div className="space-y-1">
-                    <label className="text-[8px] font-black text-slate-400 uppercase ml-2 tracking-widest">Vencimento</label>
-                    <input required name="dueDate" type="number" min="1" max="31" defaultValue="1" className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm font-black" />
+                  <div className="space-y-2">
+                    <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Vencimento</label>
+                    <input required name="dueDate" type="number" min="1" max="31" defaultValue="1" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-base md:text-xl font-black" />
                   </div>
                 )}
               </div>
 
               {/* REPETIÇÃO COMPACTADA */}
-              <div className="space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
                 <div className="flex justify-between items-center">
-                  <label className="text-[8px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-1">
-                    <Repeat size={10} className="text-emerald-500" /> Meses
+                  <label className="text-[10px] md:text-xs font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                    <Repeat size={14} className="text-emerald-500" /> Meses
                   </label>
-                  <button type="button" onClick={selectAllMonths} className="text-[7px] font-black uppercase text-emerald-600 bg-white px-1.5 py-0.5 rounded-md border border-slate-100">
+                  <button type="button" onClick={selectAllMonths} className="text-[9px] md:text-xs font-black uppercase text-emerald-600 bg-white px-3 py-1 rounded-lg border border-slate-100 hover:bg-emerald-50 transition-colors">
                     {selectedMonths.length === 12 ? 'Reset' : 'Todos'}
                   </button>
                 </div>
-                <div className="grid grid-cols-6 gap-1">
+                <div className="grid grid-cols-6 gap-2">
                   {MONTHS.map((m, idx) => (
                     <button
                       key={m} type="button" onClick={() => toggleMonthSelection(idx)}
-                      className={`py-1.5 px-0.5 text-[8px] font-black rounded-lg border-2 transition-all ${selectedMonths.includes(idx) ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-transparent text-slate-400'}`}
+                      className={`py-2 px-1 text-[9px] md:text-sm font-black rounded-lg border-2 transition-all ${selectedMonths.includes(idx) ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-transparent text-slate-400 hover:border-slate-200'}`}
                     >
                       {m.substring(0, 3)}
                     </button>
@@ -539,16 +539,16 @@ const App: React.FC = () => {
               </div>
 
               {showModal === TransactionType.CARD_EXPENSE && (
-                <div className="space-y-1">
-                  <label className="text-[8px] font-black text-slate-400 uppercase ml-2 tracking-widest">Cartão</label>
-                  <select required name="provider" className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-xs">
+                <div className="space-y-2">
+                  <label className="text-[10px] md:text-xs font-black text-slate-400 uppercase ml-2 tracking-widest">Cartão</label>
+                  <select required name="provider" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 focus:bg-white outline-none font-bold text-sm md:text-lg">
                     <option value={CardProvider.SANTANDER}>Santander</option>
                     <option value={CardProvider.MERCADO_LIVRE}>Mercado Livre</option>
                   </select>
                 </div>
               )}
 
-              <button type="submit" className="w-full py-3.5 bg-slate-900 text-white font-black rounded-xl hover:bg-emerald-600 transition-all shadow-xl active:scale-[0.98] text-xs uppercase tracking-widest">
+              <button type="submit" className="w-full py-4 md:py-5 bg-slate-900 text-white font-black rounded-xl hover:bg-emerald-600 transition-all shadow-xl active:scale-[0.98] text-sm md:text-lg uppercase tracking-widest">
                 Confirmar Lançamento
               </button>
             </form>
