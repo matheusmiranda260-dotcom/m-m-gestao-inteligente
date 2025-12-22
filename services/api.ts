@@ -155,7 +155,7 @@ export const api = {
         const { data, error } = await supabase
             .from('card_transactions')
             .insert([{
-                description: transaction.description,
+                description: transaction.description || 'Compra no Cartão',
                 amount: transaction.amount,
                 provider: transaction.provider,
                 total_installments: transaction.totalInstallments,
