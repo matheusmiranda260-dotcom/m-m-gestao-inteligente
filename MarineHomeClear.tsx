@@ -33,7 +33,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
     const [appointments, setAppointments] = useState<MarineAppointment[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [filterType, setFilterType] = useState<'WEEK' | 'MONTH' | 'ALL'>('MONTH');
+    const [filterType] = useState<'WEEK'>('WEEK');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedClientFilter, setSelectedClientFilter] = useState<string>('ALL');
 
@@ -68,28 +68,17 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
 
             const apptDate = new Date(appt.date + 'T00:00:00'); // Garante data local
 
-            if (filterType === 'MONTH') {
-                return apptDate.getMonth() === currentDate.getMonth() &&
-                    apptDate.getFullYear() === currentDate.getFullYear();
-            } else if (filterType === 'WEEK') {
-                const startOfWeek = new Date(currentDate);
-                const day = startOfWeek.getDay();
+            const startOfWeek = new Date(currentDate);
+            const day = startOfWeek.getDay();
+            const diff = (day === 0) ? 1 : -(day - 1);
+            startOfWeek.setDate(startOfWeek.getDate() + diff);
+            startOfWeek.setHours(0, 0, 0, 0);
 
-                // Se for domingo (0), pula para a próxima segunda (+1)
-                // Se for outro dia, volta para a segunda daquela semana
-                const diff = (day === 0) ? 1 : -(day - 1);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 5); // Até Sábado
+            endOfWeek.setHours(23, 59, 59, 999);
 
-                startOfWeek.setDate(startOfWeek.getDate() + diff);
-                startOfWeek.setHours(0, 0, 0, 0);
-
-                const endOfWeek = new Date(startOfWeek);
-                endOfWeek.setDate(startOfWeek.getDate() + 5); // Até Sábado
-                endOfWeek.setHours(23, 59, 59, 999);
-
-                return apptDate >= startOfWeek && apptDate <= endOfWeek;
-            }
-
-            return true;
+            return apptDate >= startOfWeek && apptDate <= endOfWeek;
         });
     }, [appointments, searchTerm, selectedClientFilter, filterType, currentDate]);
 
@@ -247,44 +236,48 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                 {view === 'CALENDAR' ? (
                     <div className="space-y-6">
                         {/* Filters & Control */}
-                        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+                        <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col gap-4">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-xl border border-slate-100 w-full sm:w-auto overflow-hidden">
-                                    <button onClick={() => {
-                                        const newDate = new Date(currentDate);
-                                        if (filterType === 'WEEK') newDate.setDate(newDate.getDate() - 7);
-                                        else newDate.setMonth(newDate.getMonth() - 1);
-                                        setCurrentDate(newDate);
-                                    }} className="p-2 hover:bg-white rounded-lg transition-all shrink-0"><ChevronLeft size={16} /></button>
-                                    <span className="flex-1 px-4 font-bold text-[11px] md:text-sm min-w-[120px] text-center capitalize overflow-hidden text-ellipsis whitespace-nowrap">
-                                        {filterType === 'WEEK' ? `Semana de ${currentDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}` : currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-                                    </span>
-                                    <button onClick={() => {
-                                        const newDate = new Date(currentDate);
-                                        if (filterType === 'WEEK') newDate.setDate(newDate.getDate() + 7);
-                                        else newDate.setMonth(newDate.getMonth() + 1);
-                                        setCurrentDate(newDate);
-                                    }} className="p-2 hover:bg-white rounded-lg transition-all shrink-0"><ChevronRight size={16} /></button>
-                                </div>
-                                <div className="flex items-center gap-2 w-full sm:w-auto">
-                                    <select
-                                        value={filterType}
-                                        onChange={(e) => setFilterType(e.target.value as any)}
-                                        className="flex-1 sm:w-[180px] bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-blue-500 transition-all"
+                                <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100 w-full sm:w-auto">
+                                    <button
+                                        onClick={() => {
+                                            const newDate = new Date(currentDate);
+                                            newDate.setDate(newDate.getDate() - 7);
+                                            setCurrentDate(newDate);
+                                        }}
+                                        className="p-2 hover:bg-white hover:shadow-sm rounded-xl transition-all shrink-0"
                                     >
-                                        <option value="WEEK">Visão Semanal (Grade)</option>
-                                        <option value="MONTH">Visão Mensal (Lista)</option>
-                                        <option value="ALL">Ver Tudo</option>
-                                    </select>
+                                        <ChevronLeft size={18} />
+                                    </button>
+                                    <span className="flex-1 px-4 font-black text-xs md:text-sm min-w-[140px] text-center capitalize text-slate-700">
+                                        Semana de {weekDays[0].date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                                    </span>
+                                    <button
+                                        onClick={() => {
+                                            const newDate = new Date(currentDate);
+                                            newDate.setDate(newDate.getDate() + 7);
+                                            setCurrentDate(newDate);
+                                        }}
+                                        className="p-2 hover:bg-white hover:shadow-sm rounded-xl transition-all shrink-0"
+                                    >
+                                        <ChevronRight size={18} />
+                                    </button>
+                                </div>
+
+                                <div className="flex items-center gap-3 w-full sm:w-auto">
+                                    <div className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-slate-900 text-white rounded-[1.5rem] shadow-xl shadow-slate-200 transition-transform active:scale-95">
+                                        <CalendarIcon size={16} className="text-blue-400" />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Visão Semanal</span>
+                                    </div>
 
                                     <div className="flex items-center gap-2">
-                                        <div className="px-3 py-1 bg-blue-50 border border-blue-100 rounded-xl flex flex-col items-center justify-center min-w-[70px]">
-                                            <span className="text-[7px] font-black text-blue-400 uppercase leading-none mb-0.5">Previsto</span>
-                                            <span className="text-[10px] font-black text-blue-600 leading-none">R$ {weeklyStats.total.toFixed(0)}</span>
+                                        <div className="px-4 py-2 bg-white border border-slate-100 rounded-2xl flex flex-col items-center justify-center min-w-[90px] shadow-sm">
+                                            <span className="text-[8px] font-black text-slate-400 uppercase leading-none mb-1 tracking-tighter">Previsto</span>
+                                            <span className="text-xs font-black text-blue-600 leading-none">R$ {weeklyStats.total.toFixed(0)}</span>
                                         </div>
-                                        <div className="px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-xl flex flex-col items-center justify-center min-w-[70px]">
-                                            <span className="text-[7px] font-black text-emerald-400 uppercase leading-none mb-0.5">Recebido</span>
-                                            <span className="text-[10px] font-black text-emerald-600 leading-none">R$ {weeklyStats.paid.toFixed(0)}</span>
+                                        <div className="px-4 py-2 bg-white border border-slate-100 rounded-2xl flex flex-col items-center justify-center min-w-[90px] shadow-sm">
+                                            <span className="text-[8px] font-black text-slate-400 uppercase leading-none mb-1 tracking-tighter">Recebido</span>
+                                            <span className="text-xs font-black text-emerald-500 leading-none">R$ {weeklyStats.paid.toFixed(0)}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -292,21 +285,22 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
 
                             <div className="flex flex-col sm:flex-row gap-2 w-full">
                                 <div className="relative flex-1">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                     <input
                                         type="text"
-                                        placeholder="Buscar..."
+                                        placeholder="Buscar agendamento..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 transition-all"
+                                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold outline-none focus:border-blue-500 focus:bg-white transition-all"
                                     />
                                 </div>
                                 <select
                                     value={selectedClientFilter}
                                     onChange={(e) => setSelectedClientFilter(e.target.value)}
-                                    className="w-full sm:w-[150px] bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-blue-500 transition-all"
+                                    className="w-full sm:w-[180px] bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-black outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer"
+                                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1em' }}
                                 >
-                                    <option value="ALL">Clientes</option>
+                                    <option value="ALL">Todos os Clientes</option>
                                     {clients.map(c => (
                                         <option key={c.id} value={c.id}>{c.name}</option>
                                     ))}
@@ -314,154 +308,86 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                             </div>
                         </div>
 
-                        {/* Weekly Grid View */}
-                        {filterType === 'WEEK' ? (
-                            <div className="flex lg:grid lg:grid-cols-6 gap-4 overflow-x-auto pb-4 lg:pb-0 snap-x snap-mandatory">
-                                {weekDays.map((day, idx) => {
-                                    const dayNum = idx + 1;
-                                    const dayAppts = appointmentsByDay[dayNum] || [];
-                                    const dateStr = day.date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-                                    return (
-                                        <div key={day.name} className="flex-none w-[85vw] sm:w-[300px] lg:w-auto bg-white rounded-[2rem] border border-slate-200 shadow-sm flex flex-col overflow-hidden min-h-[450px] snap-center">
-                                            <div className="p-4 bg-slate-900 text-white text-center">
-                                                <h4 className="font-black uppercase tracking-widest text-[10px] opacity-60 leading-none mb-1">{day.name}</h4>
-                                                <div className="text-sm font-black tracking-tighter">{dateStr}</div>
-                                            </div>
-                                            <div className="p-3 space-y-3 flex-1 overflow-y-auto bg-slate-50/30">
-                                                {dayAppts.length > 0 ? (
-                                                    dayAppts.sort((a, b) => a.start_time.localeCompare(b.start_time)).map(appt => (
-                                                        <div
-                                                            key={appt.id}
-                                                            className={`p-3 rounded-2xl border bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group relative ${appt.is_paid ? 'border-emerald-100' : 'border-slate-100'}`}
-                                                            onClick={() => { setEditingAppt(appt); setIsApptModalOpen(true); }}
-                                                        >
-                                                            <div className="flex justify-between items-start mb-1">
-                                                                <div className="text-xs font-black text-slate-900 truncate pr-2 flex-1">{appt.client?.name}</div>
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        togglePaid(appt);
-                                                                    }}
-                                                                    className={`shrink-0 transition-colors ${appt.is_paid ? 'text-emerald-500' : 'text-slate-200 hover:text-emerald-400'}`}
-                                                                >
-                                                                    <CheckCircle2 size={16} />
-                                                                </button>
-                                                            </div>
+                        {/* Weekly Grid View - Now the ONLY view */}
+                        <div className="flex lg:grid lg:grid-cols-6 gap-4 overflow-x-auto pb-6 lg:pb-0 snap-x snap-mandatory">
+                            {weekDays.map((day, idx) => {
+                                const dayNum = idx + 1;
+                                const dayAppts = appointmentsByDay[dayNum] || [];
+                                const dateStr = day.date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                                const isToday = new Date().toDateString() === day.date.toDateString();
 
-                                                            <div className="flex flex-col gap-1 mb-2">
-                                                                <div className="flex items-center gap-1 text-[9px] font-bold text-slate-400">
-                                                                    <Clock size={10} className="text-blue-500" />
-                                                                    {appt.start_time.substring(0, 5)} - {appt.end_time.substring(0, 5)}
-                                                                </div>
-                                                                <div className="flex items-center gap-1 text-[9px] font-bold text-slate-400 truncate">
-                                                                    <MapPin size={10} className="text-red-400" />
-                                                                    {appt.client?.address}
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="text-[11px] font-black text-blue-600">R$ {appt.amount.toFixed(2)}</div>
-                                                        </div>
-                                                    ))
-                                                ) : (
-                                                    <div className="h-full flex items-center justify-center text-[10px] font-bold text-slate-300 uppercase tracking-widest">
-                                                        Livre
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            /* List View */
-                            <div className="grid grid-cols-1 gap-4">
-                                {filteredAppointments.length > 0 ? (
-                                    filteredAppointments.map(appt => (
-                                        <div key={appt.id} className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
-                                            {appt.is_paid && (
-                                                <div className="absolute top-0 right-0 bg-emerald-500 text-white px-6 py-1 rounded-bl-2xl text-[10px] font-black uppercase tracking-widest shadow-lg">
-                                                    Pago
+                                return (
+                                    <div key={day.name} className={`flex-none w-[85vw] sm:w-[320px] lg:w-auto bg-white rounded-[2.5rem] border ${isToday ? 'border-blue-400 ring-4 ring-blue-50' : 'border-slate-200'} shadow-sm flex flex-col overflow-hidden min-h-[550px] snap-center transition-all duration-500 hover:shadow-xl`}>
+                                        <div className={`p-6 ${isToday ? 'bg-gradient-to-br from-blue-600 to-blue-700' : 'bg-slate-900'} text-white text-center relative overflow-hidden`}>
+                                            {isToday && (
+                                                <>
+                                                    <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl" />
+                                                    <div className="absolute bottom-0 left-0 w-16 h-16 bg-blue-400/20 rounded-full -ml-8 -mb-8 blur-xl" />
+                                                </>
+                                            )}
+                                            <h4 className={`font-black uppercase tracking-[0.3em] text-[9px] ${isToday ? 'text-blue-100' : 'opacity-40'} leading-none mb-2`}>{day.name}</h4>
+                                            <div className="text-xl font-black tracking-tighter">{dateStr}</div>
+                                            {isToday && (
+                                                <div className="mt-3 inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[8px] font-black uppercase tracking-widest text-white border border-white/10">
+                                                    Hoje
                                                 </div>
                                             )}
-                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                                                <div className="flex items-start gap-4">
-                                                    <div className="w-16 h-16 bg-blue-50 rounded-2xl flex flex-col items-center justify-center text-blue-600 shrink-0 border border-blue-100">
-                                                        <span className="text-[10px] font-black uppercase leading-none">{new Date(appt.date).toLocaleDateString('pt-BR', { weekday: 'short' })}</span>
-                                                        <span className="text-2xl font-black leading-none">{new Date(appt.date).getDate()}</span>
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="text-xl font-black text-slate-900 mb-1">{appt.client?.name}</h3>
-                                                        <div className="flex flex-wrap gap-4 text-sm font-medium text-slate-500">
-                                                            <div className="flex items-center gap-1.5">
-                                                                <Clock size={16} className="text-blue-500" />
-                                                                {appt.start_time.substring(0, 5)} - {appt.end_time.substring(0, 5)}
+                                        </div>
+                                        <div className="p-4 space-y-4 flex-1 overflow-y-auto bg-slate-50/20">
+                                            {dayAppts.length > 0 ? (
+                                                dayAppts.sort((a, b) => a.start_time.localeCompare(b.start_time)).map(appt => (
+                                                    <div
+                                                        key={appt.id}
+                                                        className={`p-4 rounded-[2rem] border bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group relative ${appt.is_paid ? 'border-emerald-100 bg-emerald-50/10' : 'border-slate-100'}`}
+                                                        onClick={() => { setEditingAppt(appt); setIsApptModalOpen(true); }}
+                                                    >
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <div className="text-xs font-black text-slate-900 leading-tight pr-4">{appt.client?.name}</div>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    togglePaid(appt);
+                                                                }}
+                                                                className={`shrink-0 p-1 rounded-full transition-all ${appt.is_paid ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-200 bg-slate-100 hover:text-emerald-500 hover:bg-emerald-50'}`}
+                                                            >
+                                                                <CheckCircle2 size={16} strokeWidth={3} />
+                                                            </button>
+                                                        </div>
+
+                                                        <div className="space-y-1.5 mb-3">
+                                                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500">
+                                                                <Clock size={12} className="text-blue-500" />
+                                                                {appt.start_time.substring(0, 5)} — {appt.end_time.substring(0, 5)}
                                                             </div>
-                                                            <div className="flex items-center gap-1.5">
-                                                                <MapPin size={16} className="text-red-400" />
-                                                                {appt.client?.address}
+                                                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                                                                <MapPin size={12} className="text-red-400 shrink-0" />
+                                                                <span className="truncate">{appt.client?.address}</span>
                                                             </div>
-                                                            {appt.client?.phone && (
-                                                                <div className="flex items-center gap-1.5">
-                                                                    <Phone size={16} className="text-emerald-500" />
-                                                                    {appt.client.phone}
-                                                                </div>
+                                                        </div>
+
+                                                        <div className="flex justify-between items-center mt-3 pt-3 border-t border-slate-50">
+                                                            <div className="text-[12px] font-black text-blue-600">
+                                                                R$ {appt.amount.toFixed(2)}
+                                                            </div>
+                                                            {appt.is_paid && (
+                                                                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500 px-2 py-0.5 bg-emerald-50 rounded-full">Liquidado</span>
                                                             )}
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-none pt-4 md:pt-0">
-                                                    <div className="text-right">
-                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Valor do Serviço</p>
-                                                        <p className="text-2xl font-black text-slate-900">R$ {appt.amount.toFixed(2)}</p>
+                                                ))
+                                            ) : (
+                                                <div className="h-full flex flex-col items-center justify-center gap-3 py-10">
+                                                    <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center border border-slate-100">
+                                                        <Circle size={20} className="text-slate-200" />
                                                     </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <button
-                                                            onClick={() => togglePaid(appt)}
-                                                            className={`p-3 rounded-xl transition-all ${appt.is_paid ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400 hover:text-blue-600'}`}
-                                                            title={appt.is_paid ? "Marcar como não pago" : "Marcar como pago"}
-                                                        >
-                                                            {appt.is_paid ? <CheckCircle2 size={24} /> : <Circle size={24} />}
-                                                        </button>
-                                                        <button
-                                                            onClick={() => { setEditingAppt(appt); setIsApptModalOpen(true); }}
-                                                            className="p-3 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-                                                        >
-                                                            <Edit2 size={20} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => deleteAppt(appt.id)}
-                                                            className="p-3 bg-slate-50 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
-                                                        >
-                                                            <Trash2 size={20} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {appt.notes && (
-                                                <div className="mt-4 p-3 bg-slate-50 rounded-xl text-xs font-bold text-slate-500 italic border-l-4 border-blue-400">
-                                                    "{appt.notes}"
+                                                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Livre</span>
                                                 </div>
                                             )}
                                         </div>
-                                    ))
-                                ) : (
-                                    <div className="bg-white py-20 rounded-[3rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center px-6">
-                                        <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-6">
-                                            <CalendarIcon size={40} className="text-slate-300" />
-                                        </div>
-                                        <h3 className="text-2xl font-black text-slate-800 mb-2">Nenhum agendamento encontrado</h3>
-                                        <p className="text-slate-400 font-medium max-w-md">Não existem faxinas agendadas para este período ou com este filtro. Que tal agendar uma agora?</p>
-                                        <button
-                                            onClick={() => setIsApptModalOpen(true)}
-                                            className="mt-8 px-8 py-4 bg-blue-600 text-white rounded-2xl font-black shadow-xl shadow-blue-500/20 hover:scale-105 transition-all"
-                                        >
-                                            Agendar Faxina
-                                        </button>
                                     </div>
-                                )}
-                            </div>
-                        )}
+                                );
+                            })}
+                        </div>
                     </div>
                 ) : (
                     /* Clients View */
@@ -549,16 +475,16 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
             </main>
 
             {/* Fab for Mobile */}
-            <div className="fixed bottom-6 right-6 md:hidden flex flex-col gap-3">
+            <div className="fixed bottom-8 right-6 md:hidden flex flex-col gap-4 z-50">
                 <button
                     onClick={() => setIsClientModalOpen(true)}
-                    className="w-14 h-14 bg-white text-blue-600 border border-blue-100 rounded-full flex items-center justify-center shadow-xl shadow-blue-500/20 active:scale-90 transition-all"
+                    className="w-14 h-14 bg-white text-slate-900 border border-slate-200 rounded-2xl flex items-center justify-center shadow-2xl active:scale-90 transition-all"
                 >
                     <Users size={24} />
                 </button>
                 <button
                     onClick={() => setIsApptModalOpen(true)}
-                    className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-2xl shadow-blue-500/40 active:scale-95 transition-all"
+                    className="w-16 h-16 bg-blue-600 text-white rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-blue-500/40 active:scale-95 transition-all"
                 >
                     <Plus size={32} strokeWidth={3} />
                 </button>
