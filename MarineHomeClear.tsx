@@ -219,8 +219,8 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-            {/* Header */}
-            <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
+            {/* Header - Hidden on Mobile for extra focus */}
+            <header className="bg-white border-b border-slate-200 sticky top-0 z-30 hidden md:block">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <button
@@ -255,8 +255,8 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div className="space-y-6">
-                    {/* Filters & Control */}
-                    <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col gap-4">
+                    {/* Filters & Control - Hidden on Mobile */}
+                    <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col gap-4 hidden md:flex">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div className="flex items-center justify-between bg-slate-50 p-1 rounded-2xl border border-slate-100 w-full sm:w-auto">
                                 <button
@@ -317,7 +317,6 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                                 Ir para Hoje
                             </button>
                         </div>
-
                     </div>
 
                     {/* Weekly Grid View - Now the ONLY view */}
