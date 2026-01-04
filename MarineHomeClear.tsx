@@ -219,19 +219,57 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-            {/* Header - Hidden on Mobile */}
-            <header className="bg-white border-b border-slate-200 hidden md:block">
+            {/* Header - Desktop & Tablet */}
+            <header className="bg-white border-b border-slate-200 hidden md:block sticky top-0 z-40">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-full"><ArrowLeft size={20} /></button>
+                        <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><ArrowLeft size={20} className="text-slate-500" /></button>
                         <div className="flex items-center gap-3">
-                            <img src="/mascot.png" alt="M" className="w-10 h-10 rounded-full border shadow-sm" />
+                            <img src="/mascot.png" alt="M" className="w-10 h-10 rounded-full border shadow-sm object-cover" />
                             <h1 className="text-xl font-black text-blue-600">Marine</h1>
                         </div>
                     </div>
-                    <button onClick={() => setIsManageClientsOpen(true)} className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
-                        <Users size={20} />
-                    </button>
+
+                    {/* Central Controls: Week Nav & Totals */}
+                    <div className="flex items-center gap-8">
+                        <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 p-1 rounded-2xl">
+                            <button
+                                onClick={() => { const d = new Date(currentDate); d.setDate(d.getDate() - 7); setCurrentDate(d); }}
+                                className="p-2 hover:bg-white hover:shadow-sm rounded-xl transition-all"
+                            >
+                                <ChevronLeft size={20} className="text-slate-600" />
+                            </button>
+                            <div className="flex flex-col items-center min-w-[100px]">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Semana de</span>
+                                <span className="text-sm font-black text-slate-900">{weekDays[0].date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>
+                            </div>
+                            <button
+                                onClick={() => { const d = new Date(currentDate); d.setDate(d.getDate() + 7); setCurrentDate(d); }}
+                                className="p-2 hover:bg-white hover:shadow-sm rounded-xl transition-all"
+                            >
+                                <ChevronRight size={20} className="text-slate-600" />
+                            </button>
+                        </div>
+
+                        <div className="flex items-center gap-4 bg-emerald-50 border border-emerald-100 px-5 py-2 rounded-2xl shadow-sm">
+                            <div className="flex flex-col">
+                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">Total Semanal</span>
+                                <span className="text-lg font-black text-emerald-700 leading-none">R$ {weeklyStats.total.toFixed(0)}</span>
+                            </div>
+                            <div className="w-px h-8 bg-emerald-200/50" />
+                            <div className="flex flex-col">
+                                <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest leading-none mb-1">Recebido</span>
+                                <span className="text-lg font-black text-blue-700 leading-none">R$ {weeklyStats.paid.toFixed(0)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => setCurrentDate(new Date())} className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-blue-600 transition-all">Hoje</button>
+                        <button onClick={() => setIsManageClientsOpen(true)} className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                            <Users size={20} />
+                        </button>
+                    </div>
                 </div>
             </header>
 
