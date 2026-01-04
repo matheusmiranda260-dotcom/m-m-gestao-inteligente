@@ -8,17 +8,18 @@ import {
     Filter,
     ChevronLeft,
     ChevronRight,
+    Circle,
     Clock,
     DollarSign,
-    MapPin,
-    Phone,
-    MoreVertical,
-    CheckCircle2,
-    Circle,
-    X,
-    Trash2,
     Edit2,
-    ArrowLeft
+    MapPin,
+    MoreVertical,
+    Phone,
+    Trash2,
+    UserPlus,
+    X,
+    ArrowLeft,
+    CheckCircle2
 } from 'lucide-react';
 import { api } from './services/api';
 import { MarineClient, MarineAppointment } from './types';
@@ -41,6 +42,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
     const [isClientModalOpen, setIsClientModalOpen] = useState(false);
     const [isManageClientsOpen, setIsManageClientsOpen] = useState(false);
     const [isApptModalOpen, setIsApptModalOpen] = useState(false);
+    const [isFabOpen, setIsFabOpen] = useState(false);
     const [editingClient, setEditingClient] = useState<MarineClient | null>(null);
     const [editingAppt, setEditingAppt] = useState<MarineAppointment | null>(null);
 
@@ -239,34 +241,14 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-4">
                         <button
                             onClick={() => setIsManageClientsOpen(true)}
-                            className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all md:hidden"
+                            className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                             title="Gerenciar Clientes"
                         >
                             <Users size={20} />
                         </button>
-                        <div className="hidden md:flex items-center gap-3">
-                            <button
-                                onClick={() => setIsManageClientsOpen(true)}
-                                className="px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center gap-2"
-                            >
-                                <Users size={16} /> Gerenciar Clientes
-                            </button>
-                            <button
-                                onClick={() => { setEditingClient(null); setIsClientModalOpen(true); }}
-                                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all flex items-center gap-2"
-                            >
-                                <Plus size={16} /> Novo Cliente
-                            </button>
-                            <button
-                                onClick={() => { setEditingAppt(null); setIsApptModalOpen(true); }}
-                                className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-black hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg shadow-blue-500/20"
-                            >
-                                <Plus size={16} /> Agendar Faxina
-                            </button>
-                        </div>
                     </div>
                 </div>
             </header>
@@ -421,17 +403,28 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                                                     className={`p-4 rounded-[2rem] border bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group relative ${appt.is_paid ? 'border-emerald-100 bg-emerald-50/10' : 'border-yellow-100 bg-yellow-50/5'}`}
                                                     onClick={() => { setEditingAppt(appt); setIsApptModalOpen(true); }}
                                                 >
-                                                    <div className="flex justify-between items-start mb-2">
+                                                    <div className="flex justify-between items-start mb-2 group/card">
                                                         <div className="text-xs font-black text-slate-900 leading-tight pr-4">{appt.client?.name}</div>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                togglePaid(appt);
-                                                            }}
-                                                            className={`shrink-0 p-1 rounded-full transition-all ${appt.is_paid ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-200 bg-yellow-50 hover:text-yellow-600 hover:bg-yellow-100'}`}
-                                                        >
-                                                            <CheckCircle2 size={16} strokeWidth={3} />
-                                                        </button>
+                                                        <div className="flex items-center gap-1">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    deleteAppt(appt.id);
+                                                                }}
+                                                                className="p-1 px-1.5 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    togglePaid(appt);
+                                                                }}
+                                                                className={`shrink-0 p-1 rounded-full transition-all ${appt.is_paid ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-200 bg-yellow-50 hover:text-yellow-600 hover:bg-yellow-100'}`}
+                                                            >
+                                                                <CheckCircle2 size={16} strokeWidth={3} />
+                                                            </button>
+                                                        </div>
                                                     </div>
 
                                                     <div className="space-y-1.5 mb-3">
@@ -466,6 +459,20 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                                             </div>
                                         )}
                                     </div>
+
+                                    {/* Daily Footer Summary */}
+                                    <div className={`p-4 border-t ${isToday ? 'bg-blue-50/50 border-blue-100' : 'bg-slate-50/50 border-slate-100'}`}>
+                                        <div className="flex justify-between items-center px-1">
+                                            <div className="flex flex-col">
+                                                <span className="text-[7px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest px-1.5 rounded-full w-fit mb-1">Total Previsto</span>
+                                                <span className={`text-sm font-black ${isToday ? 'text-blue-700' : 'text-slate-900'}`}>R$ {dayAppts.reduce((sum, a) => sum + a.amount, 0).toFixed(0)}</span>
+                                            </div>
+                                            <div className="flex flex-col items-end">
+                                                <span className="text-[7px] font-black text-emerald-500 border border-emerald-100 uppercase tracking-widest px-1.5 rounded-full w-fit mb-1">Recebido</span>
+                                                <span className="text-sm font-black text-emerald-600">R$ {dayAppts.filter(a => a.is_paid).reduce((sum, a) => sum + a.amount, 0).toFixed(0)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             );
                         })}
@@ -473,19 +480,44 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                 </div>
             </main>
 
-            {/* Fab for Mobile */}
-            <div className="fixed bottom-8 right-6 md:hidden flex flex-col gap-4 z-50">
+            {/* Enhanced Magic FAB */}
+            <div className="fixed bottom-8 right-6 z-50 flex flex-col items-end gap-3">
+                {isFabOpen && (
+                    <div className="flex flex-col items-end gap-3 mb-2 animate-in slide-in-from-bottom-5">
+                        <button
+                            onClick={() => { setIsManageClientsOpen(true); setIsFabOpen(false); }}
+                            className="group flex items-center gap-3"
+                        >
+                            <span className="bg-white px-3 py-1.5 rounded-xl shadow-lg border border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-600 opacity-0 group-hover:opacity-100 transition-all">Clientes</span>
+                            <div className="w-12 h-12 bg-white text-slate-600 border border-slate-200 rounded-2xl flex items-center justify-center shadow-xl active:scale-95 transition-all">
+                                <Users size={20} />
+                            </div>
+                        </button>
+                        <button
+                            onClick={() => { setEditingClient(null); setIsClientModalOpen(true); setIsFabOpen(false); }}
+                            className="group flex items-center gap-3"
+                        >
+                            <span className="bg-white px-3 py-1.5 rounded-xl shadow-lg border border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-600 opacity-0 group-hover:opacity-100 transition-all">Novo Cliente</span>
+                            <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-xl active:scale-95 transition-all">
+                                <UserPlus size={20} />
+                            </div>
+                        </button>
+                        <button
+                            onClick={() => { setEditingAppt(null); setIsApptModalOpen(true); setIsFabOpen(false); }}
+                            className="group flex items-center gap-3"
+                        >
+                            <span className="bg-white px-3 py-1.5 rounded-xl shadow-lg border border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-600 opacity-0 group-hover:opacity-100 transition-all">Agendar Faxina</span>
+                            <div className="w-14 h-14 bg-blue-600 text-white rounded-[1.2rem] flex items-center justify-center shadow-xl active:scale-95 transition-all">
+                                <Plus size={24} strokeWidth={3} />
+                            </div>
+                        </button>
+                    </div>
+                )}
                 <button
-                    onClick={() => setIsManageClientsOpen(true)}
-                    className="w-14 h-14 bg-white text-slate-900 border border-slate-200 rounded-2xl flex items-center justify-center shadow-2xl active:scale-90 transition-all"
+                    onClick={() => setIsFabOpen(!isFabOpen)}
+                    className={`w-16 h-16 rounded-[1.8rem] flex items-center justify-center shadow-2xl transition-all active:scale-90 ${isFabOpen ? 'bg-slate-900 text-white rotate-45' : 'bg-blue-600 text-white shadow-blue-500/40'}`}
                 >
-                    <Users size={24} />
-                </button>
-                <button
-                    onClick={() => setIsApptModalOpen(true)}
-                    className="w-16 h-16 bg-blue-600 text-white rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-blue-500/40 active:scale-95 transition-all"
-                >
-                    <Plus size={32} strokeWidth={3} />
+                    <Plus size={36} strokeWidth={3} />
                 </button>
             </div>
 
