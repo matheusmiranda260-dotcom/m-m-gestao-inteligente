@@ -295,5 +295,71 @@ export const api = {
                 }]);
             return !error;
         }
+    },
+
+    // Marine Home Clear API
+    marine: {
+        fetchClients: async () => {
+            const { data, error } = await supabase
+                .from('marine_clients')
+                .select('*')
+                .order('name');
+            if (error) return [];
+            return data;
+        },
+        addClient: async (client: Omit<any, 'id'>) => {
+            const { data, error } = await supabase
+                .from('marine_clients')
+                .insert([client])
+                .select()
+                .single();
+            return { data, error };
+        },
+        updateClient: async (id: string, updates: any) => {
+            const { error } = await supabase
+                .from('marine_clients')
+                .update(updates)
+                .eq('id', id);
+            return !error;
+        },
+        deleteClient: async (id: string) => {
+            const { error } = await supabase
+                .from('marine_clients')
+                .delete()
+                .eq('id', id);
+            return !error;
+        },
+        fetchAppointments: async () => {
+            const { data, error } = await supabase
+                .from('marine_appointments')
+                .select('*, client:marine_clients(*)')
+                .order('date', { ascending: true })
+                .order('start_time', { ascending: true });
+            if (error) return [];
+            return data;
+        },
+        addAppointment: async (appointment: any) => {
+            const { data, error } = await supabase
+                .from('marine_appointments')
+                .insert([appointment])
+                .select()
+                .single();
+            return { data, error };
+        },
+        updateAppointment: async (id: string, updates: any) => {
+            const { error } = await supabase
+                .from('marine_appointments')
+                .update(updates)
+                .eq('id', id);
+            return !error;
+        },
+        deleteAppointment: async (id: string) => {
+            const { error } = await supabase
+                .from('marine_appointments')
+                .delete()
+                .eq('id', id);
+            return !error;
+        }
     }
 };
+

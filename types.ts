@@ -62,3 +62,27 @@ export interface FinancialData {
   fixedExpenses: FixedExpense[];
   incomes: Income[];
 }
+
+export interface MarineClient {
+  id: string;
+  name: string;
+  phone: string;
+  address: string;
+  notes: string;
+  created_at?: string;
+}
+
+export interface MarineAppointment {
+  id: string;
+  client_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  amount: number;
+  is_paid: boolean;
+  notes: string;
+  created_at?: string;
+  // Join data
+  client?: MarineClient;
+}
+
