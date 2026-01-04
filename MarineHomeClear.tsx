@@ -195,9 +195,15 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                         >
                             <ArrowLeft size={20} className="text-slate-500" />
                         </button>
-                        <div>
-                            <h1 className="text-xl font-black tracking-tight text-blue-600">Marine Home Clear</h1>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Gestão de Faxinas</p>
+                        <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <div className="absolute -inset-1 bg-yellow-400 rounded-full blur opacity-25"></div>
+                                <img src="/mascot.png" alt="Mascote Marine" className="w-12 h-12 rounded-full border-2 border-white shadow-lg relative z-10 object-cover" />
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-black tracking-tight text-blue-600 leading-none">Marine</h1>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1">Gestão Inteligente</p>
+                            </div>
                         </div>
                     </div>
 
@@ -233,8 +239,31 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div className="space-y-6">
+                    {/* Welcome Section with Mascot */}
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-[2rem] p-6 text-white shadow-xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-white/20 transition-all duration-700" />
+                        <div className="absolute bottom-0 right-12 w-32 h-32 bg-yellow-400/20 rounded-full -mb-10 blur-2xl" />
+
+                        <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+                            <div className="hidden md:block shrink-0">
+                                <img src="/mascot.png" alt="Marine" className="w-24 h-24 rounded-2xl border-2 border-white/20 shadow-2xl object-cover transform -rotate-3 hover:rotate-0 transition-transform" />
+                            </div>
+                            <div className="text-center md:text-left flex-1">
+                                <h2 className="text-2xl font-black tracking-tight mb-1">Olá, Marine! <span>✨</span></h2>
+                                <p className="text-blue-100 text-xs font-bold uppercase tracking-widest opacity-80">Hoje você tem <span className="text-yellow-400">{filteredAppointments.filter(a => a.date === new Date().toISOString().split('T')[0]).length} faxinas</span> agendadas.</p>
+                            </div>
+                            <div className="flex gap-2 w-full md:w-auto">
+                                <button
+                                    onClick={() => { setEditingAppt(null); setIsApptModalOpen(true); }}
+                                    className="flex-1 md:flex-none px-6 py-3 bg-yellow-400 text-slate-900 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-900/20 active:scale-95"
+                                >
+                                    Agendar Agora
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     {/* Filters & Control */}
                     <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col gap-4">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -268,15 +297,15 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                             </div>
 
                             <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                                <div className="px-4 py-2 bg-white border border-slate-100 rounded-2xl flex items-center gap-3 shadow-sm">
+                                <div className="px-4 py-2 bg-yellow-400 border border-yellow-500 rounded-2xl flex items-center gap-3 shadow-sm">
                                     <div className="flex flex-col items-center">
-                                        <span className="text-[7px] font-black text-slate-400 uppercase tracking-tighter">Previsto</span>
-                                        <span className="text-[11px] font-black text-blue-600">R$ {weeklyStats.total.toFixed(0)}</span>
+                                        <span className="text-[7px] font-black text-yellow-800 uppercase tracking-tighter">Previsto</span>
+                                        <span className="text-[11px] font-black text-slate-900">R$ {weeklyStats.total.toFixed(0)}</span>
                                     </div>
-                                    <div className="w-px h-6 bg-slate-100" />
+                                    <div className="w-px h-6 bg-yellow-500/30" />
                                     <div className="flex flex-col items-center">
-                                        <span className="text-[7px] font-black text-slate-400 uppercase tracking-tighter">Recebido</span>
-                                        <span className="text-[11px] font-black text-emerald-500">R$ {weeklyStats.paid.toFixed(0)}</span>
+                                        <span className="text-[7px] font-black text-yellow-800 uppercase tracking-tighter">Recebido</span>
+                                        <span className="text-[11px] font-black text-slate-900">R$ {weeklyStats.paid.toFixed(0)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -339,7 +368,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                                             dayAppts.sort((a, b) => a.start_time.localeCompare(b.start_time)).map(appt => (
                                                 <div
                                                     key={appt.id}
-                                                    className={`p-4 rounded-[2rem] border bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group relative ${appt.is_paid ? 'border-emerald-100 bg-emerald-50/10' : 'border-slate-100'}`}
+                                                    className={`p-4 rounded-[2rem] border bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group relative ${appt.is_paid ? 'border-emerald-100 bg-emerald-50/10' : 'border-yellow-100 bg-yellow-50/5'}`}
                                                     onClick={() => { setEditingAppt(appt); setIsApptModalOpen(true); }}
                                                 >
                                                     <div className="flex justify-between items-start mb-2">
@@ -349,7 +378,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                                                                 e.stopPropagation();
                                                                 togglePaid(appt);
                                                             }}
-                                                            className={`shrink-0 p-1 rounded-full transition-all ${appt.is_paid ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-200 bg-slate-100 hover:text-emerald-500 hover:bg-emerald-50'}`}
+                                                            className={`shrink-0 p-1 rounded-full transition-all ${appt.is_paid ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-200 bg-yellow-50 hover:text-yellow-600 hover:bg-yellow-100'}`}
                                                         >
                                                             <CheckCircle2 size={16} strokeWidth={3} />
                                                         </button>
@@ -358,7 +387,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                                                     <div className="space-y-1.5 mb-3">
                                                         <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500">
                                                             <Clock size={12} className="text-blue-500" />
-                                                            {appt.start_time.substring(0, 5)} — {appt.end_time.substring(0, 5)}
+                                                            <span>{appt.start_time} - {appt.end_time}</span>
                                                         </div>
                                                         <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
                                                             <MapPin size={12} className="text-red-400 shrink-0" />
@@ -367,11 +396,13 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                                                     </div>
 
                                                     <div className="flex justify-between items-center mt-3 pt-3 border-t border-slate-50">
-                                                        <div className="text-[12px] font-black text-blue-600">
+                                                        <div className={`text-[12px] font-black ${appt.is_paid ? 'text-emerald-600' : 'text-blue-600'}`}>
                                                             R$ {appt.amount.toFixed(2)}
                                                         </div>
-                                                        {appt.is_paid && (
-                                                            <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500 px-2 py-0.5 bg-emerald-50 rounded-full">Liquidado</span>
+                                                        {appt.is_paid ? (
+                                                            <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500 px-2 py-0.5 bg-emerald-50 rounded-full">Pago</span>
+                                                        ) : (
+                                                            <span className="text-[8px] font-black uppercase tracking-widest text-yellow-600 px-2 py-0.5 bg-yellow-100/50 rounded-full">Pendente</span>
                                                         )}
                                                     </div>
                                                 </div>
@@ -412,10 +443,10 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
             {isManageClientsOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
                     <div className="bg-white rounded-[2.5rem] w-full max-w-2xl h-[80vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95">
-                        <div className="p-6 bg-slate-900 text-white flex justify-between items-center">
+                        <div className="p-6 bg-gradient-to-r from-slate-900 to-blue-900 text-white flex justify-between items-center">
                             <div>
                                 <h3 className="text-xl font-black">Gerenciar Clientes</h3>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1">Lista de todos os clientes cadastrados</p>
+                                <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest leading-none mt-1">Sua lista de contatos</p>
                             </div>
                             <button onClick={() => setIsManageClientsOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-all"><X /></button>
                         </div>
@@ -484,9 +515,9 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
             {isClientModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
                     <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95">
-                        <div className="p-6 bg-slate-900 text-white flex justify-between items-center">
+                        <div className="p-6 bg-gradient-to-r from-blue-700 to-blue-900 text-white flex justify-between items-center">
                             <h3 className="text-xl font-black">{editingClient ? 'Editar Cliente' : 'Novo Cliente'}</h3>
-                            <button onClick={() => setIsClientModalOpen(false)}><X /></button>
+                            <button onClick={() => setIsClientModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-all"><X /></button>
                         </div>
                         <form onSubmit={handleAddClient} className="p-6 space-y-4">
                             <div>
@@ -518,9 +549,9 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
             {isApptModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
                     <div className="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95">
-                        <div className="p-6 bg-slate-900 text-white flex justify-between items-center">
+                        <div className="p-6 bg-gradient-to-r from-blue-700 to-blue-900 text-white flex justify-between items-center">
                             <h3 className="text-xl font-black">{editingAppt?.id ? 'Editar Agendamento' : 'Agendar Faxina'}</h3>
-                            <button onClick={() => setIsApptModalOpen(false)}><X /></button>
+                            <button onClick={() => setIsApptModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-all"><X /></button>
                         </div>
                         <form onSubmit={handleAddAppt} className="p-6 space-y-4">
                             <div>
