@@ -219,167 +219,162 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-            {/* Header - Desktop & Tablet */}
-            <header className="bg-white border-b border-slate-200 hidden md:block sticky top-0 z-40">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><ArrowLeft size={20} className="text-slate-500" /></button>
-                        <div className="flex items-center gap-3">
-                            <img src="/mascot.png" alt="M" className="w-10 h-10 rounded-full border shadow-sm object-cover" />
-                            <h1 className="text-xl font-black text-blue-600">Marine</h1>
+            {/* Top Header - Responsive */}
+            <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 md:gap-4 leading-none">
+                        <button onClick={onBack} className="p-1.5 hover:bg-slate-100 rounded-full transition-colors"><ArrowLeft size={18} className="text-slate-500" /></button>
+                        <div className="flex items-center gap-2">
+                            <img src="/mascot.png" alt="M" className="w-8 h-8 md:w-10 md:h-10 rounded-full border shadow-sm object-cover" />
+                            <h1 className="text-base md:text-xl font-black text-blue-600">Marine</h1>
                         </div>
                     </div>
 
-                    {/* Central Controls: Week Nav & Totals */}
-                    <div className="flex items-center gap-8">
-                        <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 p-1 rounded-2xl">
-                            <button
-                                onClick={() => { const d = new Date(currentDate); d.setDate(d.getDate() - 7); setCurrentDate(d); }}
-                                className="p-2 hover:bg-white hover:shadow-sm rounded-xl transition-all"
-                            >
-                                <ChevronLeft size={20} className="text-slate-600" />
-                            </button>
-                            <div className="flex flex-col items-center min-w-[100px]">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Semana de</span>
-                                <span className="text-sm font-black text-slate-900">{weekDays[0].date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>
-                            </div>
-                            <button
-                                onClick={() => { const d = new Date(currentDate); d.setDate(d.getDate() + 7); setCurrentDate(d); }}
-                                className="p-2 hover:bg-white hover:shadow-sm rounded-xl transition-all"
-                            >
-                                <ChevronRight size={20} className="text-slate-600" />
-                            </button>
+                    {/* Totals - Visible on all screens, more compact on mobile */}
+                    <div className="flex items-center gap-2 md:gap-6 bg-emerald-50 border border-emerald-100 px-3 md:px-5 py-1.5 md:py-2 rounded-xl md:rounded-2xl">
+                        <div className="flex md:flex-col items-center md:items-start gap-2 md:gap-0">
+                            <span className="text-[7px] md:text-[9px] font-black text-emerald-600 uppercase tracking-widest leading-none">Total</span>
+                            <span className="text-xs md:text-lg font-black text-emerald-700 leading-none">R$ {weeklyStats.total.toFixed(0)}</span>
                         </div>
-
-                        <div className="flex items-center gap-4 bg-emerald-50 border border-emerald-100 px-5 py-2 rounded-2xl shadow-sm">
-                            <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">Total Semanal</span>
-                                <span className="text-lg font-black text-emerald-700 leading-none">R$ {weeklyStats.total.toFixed(0)}</span>
-                            </div>
-                            <div className="w-px h-8 bg-emerald-200/50" />
-                            <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest leading-none mb-1">Recebido</span>
-                                <span className="text-lg font-black text-blue-700 leading-none">R$ {weeklyStats.paid.toFixed(0)}</span>
-                            </div>
+                        <div className="w-px h-4 md:h-8 bg-emerald-200/50" />
+                        <div className="flex md:flex-col items-center md:items-start gap-2 md:gap-0">
+                            <span className="text-[7px] md:text-[9px] font-black text-blue-600 uppercase tracking-widest leading-none">Pago</span>
+                            <span className="text-xs md:text-lg font-black text-blue-700 leading-none">R$ {weeklyStats.paid.toFixed(0)}</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => setCurrentDate(new Date())} className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-blue-600 transition-all">Hoje</button>
-                        <button onClick={() => setIsManageClientsOpen(true)} className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
-                            <Users size={20} />
+                    <div className="flex items-center gap-1 md:gap-3">
+                        <button onClick={() => setCurrentDate(new Date())} className="hidden sm:block px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-white transition-all">Hoje</button>
+                        <button onClick={() => setIsManageClientsOpen(true)} className="p-2 text-slate-500 hover:text-blue-600 rounded-lg">
+                            <Users size={18} />
                         </button>
                     </div>
                 </div>
-            </header>
 
-            {/* Mobile Minimalist Nav - Visible ONLY on Mobile */}
-            <div className="md:hidden flex items-center justify-between mb-4 px-2">
-                <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-2xl p-1 shadow-sm">
-                    <button onClick={() => { const d = new Date(currentDate); d.setDate(d.getDate() - 7); setCurrentDate(d); }} className="p-2 active:bg-slate-100 rounded-xl"><ChevronLeft size={18} /></button>
-                    <div className="flex flex-col items-center px-2">
+                {/* Week Navigation - Under header on Mobile, integrated on Desktop */}
+                <div className="md:hidden flex items-center justify-between px-4 py-2 bg-slate-50 border-t border-slate-100">
+                    <button
+                        onClick={() => { const d = new Date(currentDate); d.setDate(d.getDate() - 7); setCurrentDate(d); }}
+                        className="p-1 px-2 hover:bg-white rounded-lg border border-slate-200 transition-all"
+                    >
+                        <ChevronLeft size={16} />
+                    </button>
+                    <div className="flex flex-col items-center">
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">Semana de</span>
                         <span className="text-[11px] font-black text-slate-900 leading-none">{weekDays[0].date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>
                     </div>
-                    <button onClick={() => { const d = new Date(currentDate); d.setDate(d.getDate() + 7); setCurrentDate(d); }} className="p-2 active:bg-slate-100 rounded-xl"><ChevronRight size={18} /></button>
+                    <button
+                        onClick={() => { const d = new Date(currentDate); d.setDate(d.getDate() + 7); setCurrentDate(d); }}
+                        className="p-1 px-2 hover:bg-white rounded-lg border border-slate-200 transition-all"
+                    >
+                        <ChevronRight size={16} />
+                    </button>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="flex flex-col items-end">
-                        <span className="text-[11px] font-black text-emerald-600 leading-none">R$ {weeklyStats.paid.toFixed(0)}</span>
-                        <span className="text-[7px] font-black text-slate-400 uppercase">Recebido</span>
+            </header>
+
+            <main className="max-w-7xl mx-auto px-4 py-4 md:py-6">
+                {/* Desktop Week Nav Row - Hidden on Mobile */}
+                <div className="hidden md:flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3 bg-white border border-slate-200 p-1 rounded-2xl">
+                        <button onClick={() => { const d = new Date(currentDate); d.setDate(d.getDate() - 7); setCurrentDate(d); }} className="p-2 hover:bg-slate-50 rounded-xl"><ChevronLeft size={20} /></button>
+                        <div className="flex flex-col items-center px-4">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Semana de</span>
+                            <span className="text-sm font-black text-slate-900">{weekDays[0].date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>
+                        </div>
+                        <button onClick={() => { const d = new Date(currentDate); d.setDate(d.getDate() + 7); setCurrentDate(d); }} className="p-2 hover:bg-slate-50 rounded-xl"><ChevronRight size={20} /></button>
                     </div>
-                    <button onClick={onBack} className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400"><ArrowLeft size={18} /></button>
+                    <button onClick={() => setCurrentDate(new Date())} className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-95 transition-all">Ir para Hoje</button>
                 </div>
-            </div>
+                {/* Weekly Grid View - Now the ONLY view */}
+                <div className="flex lg:grid lg:grid-cols-7 gap-4 overflow-x-auto pb-6 lg:pb-0 snap-x snap-mandatory">
+                    {weekDays.map((day, idx) => {
+                        // appointmentsByDay usa o getDay do JS: 0=Dom, 1=Seg...
+                        // weekDays[0] é Segunda (day 1), weekDays[6] é Domingo (day 0)
+                        const currentJSDate = day.date.getDay();
+                        const dayAppts = appointmentsByDay[currentJSDate] || [];
+                        const dateStr = day.date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                        const isToday = new Date().toDateString() === day.date.toDateString();
 
-            {/* Weekly Grid View - Now the ONLY view */}
-            <div className="flex lg:grid lg:grid-cols-7 gap-4 overflow-x-auto pb-6 lg:pb-0 snap-x snap-mandatory">
-                {weekDays.map((day, idx) => {
-                    // appointmentsByDay usa o getDay do JS: 0=Dom, 1=Seg...
-                    // weekDays[0] é Segunda (day 1), weekDays[6] é Domingo (day 0)
-                    const currentJSDate = day.date.getDay();
-                    const dayAppts = appointmentsByDay[currentJSDate] || [];
-                    const dateStr = day.date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-                    const isToday = new Date().toDateString() === day.date.toDateString();
-
-                    return (
-                        <div key={day.name} className={`flex-none w-[90vw] sm:w-[320px] lg:w-auto bg-white rounded-[1.5rem] border ${isToday ? 'border-blue-500 ring-1 ring-blue-100' : 'border-slate-200'} shadow-sm flex flex-col overflow-hidden h-[75vh] lg:h-[600px] snap-center transition-all duration-300`}>
-                            <div className={`py-3 ${isToday ? 'bg-blue-600' : 'bg-slate-900'} text-white text-center`}>
-                                <h4 className={`font-black uppercase tracking-[0.2em] text-[7px] ${isToday ? 'text-blue-100' : 'opacity-40'} mb-0.5`}>{day.name}</h4>
-                                <div className="text-base font-black">{dateStr}</div>
-                            </div>
-                            <div className="p-4 space-y-4 flex-1 overflow-y-auto bg-slate-50/20">
-                                {dayAppts.length > 0 ? (
-                                    dayAppts.sort((a, b) => a.start_time.localeCompare(b.start_time)).map(appt => (
-                                        <div
-                                            key={appt.id}
-                                            className={`p-3 rounded-2xl border bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group relative ${appt.is_paid ? 'border-emerald-100 bg-emerald-50/10' : 'border-yellow-100 bg-yellow-50/5'}`}
-                                            onClick={() => { setEditingAppt(appt); setIsApptModalOpen(true); }}
-                                        >
-                                            <div className="flex justify-between items-start mb-1.5 group/card">
-                                                <div className="text-[11px] font-black text-slate-900 leading-tight pr-4 truncate">{appt.client?.name}</div>
-                                                <div className="flex items-center gap-1 shrink-0">
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); deleteAppt(appt.id); }}
-                                                        className="p-1 px-1.5 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                                                    >
-                                                        <Trash2 size={13} />
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); togglePaid(appt); }}
-                                                        className={`shrink-0 p-1 rounded-full transition-all ${appt.is_paid ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-200 bg-yellow-50 hover:text-yellow-600'}`}
-                                                    >
-                                                        <CheckCircle2 size={14} strokeWidth={3} />
-                                                    </button>
+                        return (
+                            <div key={day.name} className={`flex-none w-[90vw] sm:w-[320px] lg:w-auto bg-white rounded-[1.5rem] border ${isToday ? 'border-blue-500 ring-1 ring-blue-100' : 'border-slate-200'} shadow-sm flex flex-col overflow-hidden h-[75vh] lg:h-[600px] snap-center transition-all duration-300`}>
+                                <div className={`py-3 ${isToday ? 'bg-blue-600' : 'bg-slate-900'} text-white text-center`}>
+                                    <h4 className={`font-black uppercase tracking-[0.2em] text-[7px] ${isToday ? 'text-blue-100' : 'opacity-40'} mb-0.5`}>{day.name}</h4>
+                                    <div className="text-base font-black">{dateStr}</div>
+                                </div>
+                                <div className="p-4 space-y-4 flex-1 overflow-y-auto bg-slate-50/20">
+                                    {dayAppts.length > 0 ? (
+                                        dayAppts.sort((a, b) => a.start_time.localeCompare(b.start_time)).map(appt => (
+                                            <div
+                                                key={appt.id}
+                                                className={`p-3 rounded-2xl border bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group relative ${appt.is_paid ? 'border-emerald-100 bg-emerald-50/10' : 'border-yellow-100 bg-yellow-50/5'}`}
+                                                onClick={() => { setEditingAppt(appt); setIsApptModalOpen(true); }}
+                                            >
+                                                <div className="flex justify-between items-start mb-1.5 group/card">
+                                                    <div className="text-[11px] font-black text-slate-900 leading-tight pr-4 truncate">{appt.client?.name}</div>
+                                                    <div className="flex items-center gap-1 shrink-0">
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); deleteAppt(appt.id); }}
+                                                            className="p-1 px-1.5 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                                        >
+                                                            <Trash2 size={13} />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); togglePaid(appt); }}
+                                                            className={`shrink-0 p-1 rounded-full transition-all ${appt.is_paid ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-200 bg-yellow-50 hover:text-yellow-600'}`}
+                                                        >
+                                                            <CheckCircle2 size={14} strokeWidth={3} />
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div className="space-y-1 mb-2">
-                                                <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400">
-                                                    <Clock size={11} className="text-blue-500 shrink-0" />
-                                                    <span>{appt.start_time}-{appt.end_time}</span>
+                                                <div className="space-y-1 mb-2">
+                                                    <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400">
+                                                        <Clock size={11} className="text-blue-500 shrink-0" />
+                                                        <span>{appt.start_time}-{appt.end_time}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400">
+                                                        <MapPin size={11} className="text-red-400 shrink-0" />
+                                                        <span className="truncate">{appt.client?.address}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400">
-                                                    <MapPin size={11} className="text-red-400 shrink-0" />
-                                                    <span className="truncate">{appt.client?.address}</span>
+
+                                                <div className="flex justify-between items-center border-t border-slate-50 pt-2 mt-auto">
+                                                    <span className={`text-[11px] font-black ${appt.is_paid ? 'text-emerald-600' : 'text-blue-600'}`}>R$ {appt.amount.toFixed(0)}</span>
+                                                    <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-full ${appt.is_paid ? 'bg-emerald-50 text-emerald-500' : 'bg-yellow-100/50 text-yellow-600'}`}>
+                                                        {appt.is_paid ? 'Pago' : 'Pendente'}
+                                                    </span>
                                                 </div>
-                                            </div>
 
-                                            <div className="flex justify-between items-center border-t border-slate-50 pt-2 mt-auto">
-                                                <span className={`text-[11px] font-black ${appt.is_paid ? 'text-emerald-600' : 'text-blue-600'}`}>R$ {appt.amount.toFixed(0)}</span>
-                                                <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-full ${appt.is_paid ? 'bg-emerald-50 text-emerald-500' : 'bg-yellow-100/50 text-yellow-600'}`}>
-                                                    {appt.is_paid ? 'Pago' : 'Pendente'}
-                                                </span>
                                             </div>
-
+                                        ))
+                                    ) : (
+                                        <div className="h-full flex flex-col items-center justify-center gap-3 py-10">
+                                            <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center border border-slate-100">
+                                                <Circle size={20} className="text-slate-200" />
+                                            </div>
+                                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Livre</span>
                                         </div>
-                                    ))
-                                ) : (
-                                    <div className="h-full flex flex-col items-center justify-center gap-3 py-10">
-                                        <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center border border-slate-100">
-                                            <Circle size={20} className="text-slate-200" />
-                                        </div>
-                                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Livre</span>
-                                    </div>
-                                )}
-                            </div>
+                                    )}
+                                </div>
 
-                            {/* Daily Footer Summary */}
-                            <div className={`p-4 border-t ${isToday ? 'bg-blue-50/50 border-blue-100' : 'bg-slate-50/50 border-slate-100'}`}>
-                                <div className="flex justify-between items-center px-1">
-                                    <div className="flex flex-col">
-                                        <span className="text-[7px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest px-1.5 rounded-full w-fit mb-1">Total Previsto</span>
-                                        <span className={`text-sm font-black ${isToday ? 'text-blue-700' : 'text-slate-900'}`}>R$ {dayAppts.reduce((sum, a) => sum + a.amount, 0).toFixed(0)}</span>
-                                    </div>
-                                    <div className="flex flex-col items-end">
-                                        <span className="text-[7px] font-black text-emerald-500 border border-emerald-100 uppercase tracking-widest px-1.5 rounded-full w-fit mb-1">Recebido</span>
-                                        <span className="text-sm font-black text-emerald-600">R$ {dayAppts.filter(a => a.is_paid).reduce((sum, a) => sum + a.amount, 0).toFixed(0)}</span>
+                                {/* Daily Footer Summary */}
+                                <div className={`p-4 border-t ${isToday ? 'bg-blue-50/50 border-blue-100' : 'bg-slate-50/50 border-slate-100'}`}>
+                                    <div className="flex justify-between items-center px-1">
+                                        <div className="flex flex-col">
+                                            <span className="text-[7px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest px-1.5 rounded-full w-fit mb-1">Total Previsto</span>
+                                            <span className={`text-sm font-black ${isToday ? 'text-blue-700' : 'text-slate-900'}`}>R$ {dayAppts.reduce((sum, a) => sum + a.amount, 0).toFixed(0)}</span>
+                                        </div>
+                                        <div className="flex flex-col items-end">
+                                            <span className="text-[7px] font-black text-emerald-500 border border-emerald-100 uppercase tracking-widest px-1.5 rounded-full w-fit mb-1">Recebido</span>
+                                            <span className="text-sm font-black text-emerald-600">R$ {dayAppts.filter(a => a.is_paid).reduce((sum, a) => sum + a.amount, 0).toFixed(0)}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })}
-            </div>
+                        );
+                    })}
+                </div>
+            </main>
 
             {/* Enhanced Magic FAB */}
             <div className="fixed bottom-8 right-6 z-50 flex flex-col items-end gap-3">
