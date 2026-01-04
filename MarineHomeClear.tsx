@@ -90,7 +90,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
             startOfWeek.setHours(0, 0, 0, 0);
 
             const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 6); // Agora até Domingo (7 dias)
+            endOfWeek.setDate(startOfWeek.getDate() + 5); // Agora até Sábado (6 dias)
             endOfWeek.setHours(23, 59, 59, 999);
 
             return apptDate >= startOfWeek && apptDate <= endOfWeek;
@@ -105,7 +105,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
     }, [filteredAppointments]);
 
     const appointmentsByDay = useMemo(() => {
-        const result: Record<number, MarineAppointment[]> = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+        const result: Record<number, MarineAppointment[]> = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
 
         filteredAppointments.forEach(appt => {
             const [y, m, d] = appt.date.split('-').map(Number);
@@ -113,7 +113,9 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
             const day = date.getDay(); // 0-6 (0 é Domingo)
             // No nosso array idx de 0 a 6, vamos mapear Segunda(1) como 0... Domingo(0) como 6?
             // Melhor usar o day do JS: 0=Dom, 1=Seg...
-            result[day].push(appt);
+            if (result[day]) {
+                result[day].push(appt);
+            }
         });
 
         return result;
@@ -125,7 +127,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
         const diff = (dayIdx === 0) ? -6 : -(dayIdx - 1);
         start.setDate(start.getDate() + diff);
 
-        return ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'].map((name, i) => {
+        return ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'].map((name, i) => {
             const d = new Date(start);
             d.setDate(start.getDate() + i);
             return { name, date: d };
@@ -188,7 +190,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
         start.setDate(now.getDate() + diff);
         start.setHours(0, 0, 0, 0);
         const end = new Date(start);
-        end.setDate(start.getDate() + 6);
+        end.setDate(start.getDate() + 5); // Sábado
         end.setHours(23, 59, 59, 999);
 
         if (apptDate < start || apptDate > end) {
@@ -286,7 +288,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                     <button onClick={() => setCurrentDate(new Date())} className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-95 transition-all">Ir para Hoje</button>
                 </div>
                 {/* Weekly Grid View - Now the ONLY view */}
-                <div className="flex lg:grid lg:grid-cols-7 gap-4 overflow-x-auto pb-6 lg:pb-0 snap-x snap-mandatory">
+                <div className="flex lg:grid lg:grid-cols-6 gap-4 overflow-x-auto pb-6 lg:pb-0 snap-x snap-mandatory">
                     {weekDays.map((day, idx) => {
                         // appointmentsByDay usa o getDay do JS: 0=Dom, 1=Seg...
                         // weekDays[0] é Segunda (day 1), weekDays[6] é Domingo (day 0)
