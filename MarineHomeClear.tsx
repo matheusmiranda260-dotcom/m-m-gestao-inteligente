@@ -35,6 +35,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [filterType] = useState<'WEEK'>('WEEK');
     const [searchTerm, setSearchTerm] = useState('');
+    const [clientSearchTerm, setClientSearchTerm] = useState('');
     const [selectedClientFilter, setSelectedClientFilter] = useState<string>('ALL');
 
     const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -49,13 +50,19 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
 
     const fetchData = async () => {
         setIsLoading(true);
-        const [clientsData, apptsData] = await Promise.all([
-            api.marine.fetchClients(),
-            api.marine.fetchAppointments()
-        ]);
-        setClients(clientsData);
-        setAppointments(apptsData);
-        setIsLoading(false);
+        try {
+            const [clientsData, apptsData] = await Promise.all([
+                api.marine.fetchClients(),
+                api.marine.fetchAppointments()
+            ]);
+            console.log('Marine Sync:', { clients: clientsData.length, appointments: apptsData.length });
+            setClients(clientsData);
+            setAppointments(apptsData);
+        } catch (error) {
+            console.error('Error fetching Marine data:', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     // Filter logic
@@ -165,7 +172,28 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
 
         setIsApptModalOpen(false);
         setEditingAppt(null);
-        fetchData();
+        await fetchData();
+
+        // Se o agendamento não estiver na semana atual, avisa ou pula pra lá
+        const [y, m, d] = apptData.date.split('-').map(Number);
+        const apptDate = new Date(y, m - 1, d);
+        apptDate.setHours(0, 0, 0, 0);
+
+        const now = new Date(currentDate);
+        const dayIdx = now.getDay();
+        const diff = (dayIdx === 0) ? -6 : -(dayIdx - 1);
+        const start = new Date(now);
+        start.setDate(now.getDate() + diff);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        end.setHours(23, 59, 59, 999);
+
+        if (apptDate < start || apptDate > end) {
+            if (confirm('Agendamento salvo! Ele não está na semana atual. Deseja ir para a data do agendamento?')) {
+                setCurrentDate(apptDate);
+            }
+        }
     };
 
     const togglePaid = async (appt: MarineAppointment) => {
@@ -312,7 +340,23 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                                         <span className="text-[11px] font-black text-slate-900">R$ {weeklyStats.paid.toFixed(0)}</span>
                                     </div>
                                 </div>
+                                {appointments.length > filteredAppointments.length && !searchTerm && selectedClientFilter === 'ALL' && (
+                                    <button
+                                        onClick={() => setCurrentDate(new Date())}
+                                        className="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-all self-center border border-blue-100 shadow-sm"
+                                    >
+                                        <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" />
+                                        <span className="text-[9px] font-black uppercase tracking-widest leading-none">Agendamentos em outras semanas</span>
+                                    </button>
+                                )}
                             </div>
+
+                            <button
+                                onClick={() => setCurrentDate(new Date())}
+                                className="px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-500 hover:bg-white hover:text-blue-600 transition-all active:scale-95"
+                            >
+                                Ir para Hoje
+                            </button>
                         </div>
 
                         <div className="grid grid-cols-2 gap-2 w-full">
@@ -454,7 +498,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                                 <h3 className="text-xl font-black">Gerenciar Clientes</h3>
                                 <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest leading-none mt-1">Sua lista de contatos</p>
                             </div>
-                            <button onClick={() => setIsManageClientsOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-all"><X /></button>
+                            <button onClick={() => { setIsManageClientsOpen(false); setClientSearchTerm(''); }} className="p-2 hover:bg-white/10 rounded-full transition-all"><X /></button>
                         </div>
 
                         <div className="p-4 border-b border-slate-100 bg-slate-50/50">
@@ -464,13 +508,14 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                                     type="text"
                                     placeholder="Buscar por nome ou endereço..."
                                     className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-blue-500 transition-all"
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    value={clientSearchTerm}
+                                    onChange={(e) => setClientSearchTerm(e.target.value)}
                                 />
                             </div>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/30">
-                            {clients.filter(c => (c.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (c.address || '').toLowerCase().includes(searchTerm.toLowerCase())).map(client => (
+                            {clients.filter(c => (c.name || '').toLowerCase().includes(clientSearchTerm.toLowerCase()) || (c.address || '').toLowerCase().includes(clientSearchTerm.toLowerCase())).map(client => (
                                 <div key={client.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-blue-200 transition-all">
                                     <div className="flex items-center gap-4">
                                         <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-sm font-black">
