@@ -61,22 +61,27 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
     // Filter logic
     const filteredAppointments = useMemo(() => {
         return appointments.filter(appt => {
-            const matchesSearch = appt.client?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                appt.notes?.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesSearch = (appt.client?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (appt.notes || '').toLowerCase().includes(searchTerm.toLowerCase());
             const matchesClient = selectedClientFilter === 'ALL' || appt.client_id === selectedClientFilter;
 
             if (!matchesSearch || !matchesClient) return false;
 
-            const apptDate = new Date(appt.date + 'T00:00:00'); // Garante data local
+            const [y, m, d] = appt.date.split('-').map(Number);
+            const apptDate = new Date(y, m - 1, d); // Data local sem timezone issues
+            apptDate.setHours(0, 0, 0, 0);
 
             const startOfWeek = new Date(currentDate);
-            const day = startOfWeek.getDay();
-            const diff = (day === 0) ? 1 : -(day - 1);
+            const dayIdx = startOfWeek.getDay();
+            // Se hoje é domingo (0), queremos a semana que começa na segunda passada ou próxima segunda?
+            // Vamos fazer a semana sempre começar na segunda-feira.
+            const diff = (dayIdx === 0) ? -6 : -(dayIdx - 1);
+
             startOfWeek.setDate(startOfWeek.getDate() + diff);
             startOfWeek.setHours(0, 0, 0, 0);
 
             const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 5); // Até Sábado
+            endOfWeek.setDate(startOfWeek.getDate() + 6); // Agora até Domingo (7 dias)
             endOfWeek.setHours(23, 59, 59, 999);
 
             return apptDate >= startOfWeek && apptDate <= endOfWeek;
@@ -91,16 +96,15 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
     }, [filteredAppointments]);
 
     const appointmentsByDay = useMemo(() => {
-        const days = [1, 2, 3, 4, 5, 6];
-        const result: Record<number, MarineAppointment[]> = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+        const result: Record<number, MarineAppointment[]> = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
 
         filteredAppointments.forEach(appt => {
-            const date = new Date(appt.date);
-            const utcDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-            const day = utcDate.getDay();
-            if (day >= 1 && day <= 6) {
-                result[day].push(appt);
-            }
+            const [y, m, d] = appt.date.split('-').map(Number);
+            const date = new Date(y, m - 1, d);
+            const day = date.getDay(); // 0-6 (0 é Domingo)
+            // No nosso array idx de 0 a 6, vamos mapear Segunda(1) como 0... Domingo(0) como 6?
+            // Melhor usar o day do JS: 0=Dom, 1=Seg...
+            result[day].push(appt);
         });
 
         return result;
@@ -108,11 +112,11 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
 
     const weekDays = useMemo(() => {
         const start = new Date(currentDate);
-        const day = start.getDay();
-        const diff = (day === 0) ? 1 : -(day - 1);
+        const dayIdx = start.getDay();
+        const diff = (dayIdx === 0) ? -6 : -(dayIdx - 1);
         start.setDate(start.getDate() + diff);
 
-        return ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'].map((name, i) => {
+        return ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'].map((name, i) => {
             const d = new Date(start);
             d.setDate(start.getDate() + i);
             return { name, date: d };
@@ -339,10 +343,12 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                     </div>
 
                     {/* Weekly Grid View - Now the ONLY view */}
-                    <div className="flex lg:grid lg:grid-cols-6 gap-4 overflow-x-auto pb-6 lg:pb-0 snap-x snap-mandatory">
+                    <div className="flex lg:grid lg:grid-cols-7 gap-4 overflow-x-auto pb-6 lg:pb-0 snap-x snap-mandatory">
                         {weekDays.map((day, idx) => {
-                            const dayNum = idx + 1;
-                            const dayAppts = appointmentsByDay[dayNum] || [];
+                            // appointmentsByDay usa o getDay do JS: 0=Dom, 1=Seg...
+                            // weekDays[0] é Segunda (day 1), weekDays[6] é Domingo (day 0)
+                            const currentJSDate = day.date.getDay();
+                            const dayAppts = appointmentsByDay[currentJSDate] || [];
                             const dateStr = day.date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
                             const isToday = new Date().toDateString() === day.date.toDateString();
 
@@ -464,7 +470,7 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/30">
-                            {clients.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()) || c.address.toLowerCase().includes(searchTerm.toLowerCase())).map(client => (
+                            {clients.filter(c => (c.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (c.address || '').toLowerCase().includes(searchTerm.toLowerCase())).map(client => (
                                 <div key={client.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-blue-200 transition-all">
                                     <div className="flex items-center gap-4">
                                         <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-sm font-black">
