@@ -255,29 +255,6 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div className="space-y-6">
-                    {/* Welcome Section with Mascot */}
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-[2rem] p-6 text-white shadow-xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-                        <div className="absolute bottom-0 right-12 w-32 h-32 bg-yellow-400/20 rounded-full -mb-10 blur-2xl" />
-
-                        <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
-                            <div className="hidden md:block shrink-0">
-                                <img src="/mascot.png" alt="Marine" className="w-24 h-24 rounded-2xl border-2 border-white/20 shadow-2xl object-cover transform -rotate-3 hover:rotate-0 transition-transform" />
-                            </div>
-                            <div className="text-center md:text-left flex-1">
-                                <h2 className="text-2xl font-black tracking-tight mb-1">Olá, Marine! <span>✨</span></h2>
-                                <p className="text-blue-100 text-xs font-bold uppercase tracking-widest opacity-80">Hoje você tem <span className="text-yellow-400">{filteredAppointments.filter(a => a.date === new Date().toISOString().split('T')[0]).length} faxinas</span> agendadas.</p>
-                            </div>
-                            <div className="flex gap-2 w-full md:w-auto">
-                                <button
-                                    onClick={() => { setEditingAppt(null); setIsApptModalOpen(true); }}
-                                    className="flex-1 md:flex-none px-6 py-3 bg-yellow-400 text-slate-900 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-900/20 active:scale-95"
-                                >
-                                    Agendar Agora
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                     {/* Filters & Control */}
                     <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col gap-4">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -341,31 +318,6 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2 w-full">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                                <input
-                                    type="text"
-                                    placeholder="Buscar..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-bold outline-none focus:border-blue-500 focus:bg-white transition-all"
-                                />
-                            </div>
-                            <div className="relative">
-                                <select
-                                    value={selectedClientFilter}
-                                    onChange={(e) => setSelectedClientFilter(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-3 pr-8 py-2.5 text-[11px] font-black outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer"
-                                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2364748b\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'3\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.7rem center', backgroundSize: '1em' }}
-                                >
-                                    <option value="ALL">Clientes: Todos</option>
-                                    {clients.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
                     </div>
 
                     {/* Weekly Grid View - Now the ONLY view */}
