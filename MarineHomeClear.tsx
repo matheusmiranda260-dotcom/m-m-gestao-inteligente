@@ -342,196 +342,194 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                     );
                 })}
             </div>
-        </main>
 
-            {/* Enhanced Magic FAB */ }
-    <div className="fixed bottom-8 right-6 z-50 flex flex-col items-end gap-3">
-        {isFabOpen && (
-            <div className="flex flex-col items-end gap-3 mb-2 animate-in slide-in-from-bottom-5">
-                <button onClick={() => { setIsManageClientsOpen(true); setIsFabOpen(false); }} className="group flex items-center gap-3">
-                    <span className="bg-white px-3 py-1.5 rounded-xl shadow-lg border border-slate-100 text-[10px] font-black tracking-widest text-slate-600">CLIENTES</span>
-                    <div className="w-12 h-12 bg-white text-slate-600 border border-slate-200 rounded-2xl flex items-center justify-center shadow-xl"><Users size={20} /></div>
-                </button>
-                <button onClick={() => { setEditingClient(null); setIsClientModalOpen(true); setIsFabOpen(false); }} className="group flex items-center gap-3">
-                    <span className="bg-white px-3 py-1.5 rounded-xl shadow-lg border border-slate-100 text-[10px] font-black tracking-widest text-slate-600">NOVO CLIENTE</span>
-                    <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-xl"><UserPlus size={20} /></div>
-                </button>
-                <button onClick={() => { setEditingAppt(null); setIsApptModalOpen(true); setIsFabOpen(false); }} className="group flex items-center gap-3">
-                    <span className="bg-white px-3 py-1.5 rounded-xl shadow-lg border border-slate-100 text-[10px] font-black tracking-widest text-slate-600">AGENDAR</span>
-                    <div className="w-14 h-14 bg-blue-600 text-white rounded-[1.2rem] flex items-center justify-center shadow-xl"><Plus size={24} strokeWidth={3} /></div>
+            {/* Enhanced Magic FAB */}
+            <div className="fixed bottom-8 right-6 z-50 flex flex-col items-end gap-3">
+                {isFabOpen && (
+                    <div className="flex flex-col items-end gap-3 mb-2 animate-in slide-in-from-bottom-5">
+                        <button onClick={() => { setIsManageClientsOpen(true); setIsFabOpen(false); }} className="group flex items-center gap-3">
+                            <span className="bg-white px-3 py-1.5 rounded-xl shadow-lg border border-slate-100 text-[10px] font-black tracking-widest text-slate-600">CLIENTES</span>
+                            <div className="w-12 h-12 bg-white text-slate-600 border border-slate-200 rounded-2xl flex items-center justify-center shadow-xl"><Users size={20} /></div>
+                        </button>
+                        <button onClick={() => { setEditingClient(null); setIsClientModalOpen(true); setIsFabOpen(false); }} className="group flex items-center gap-3">
+                            <span className="bg-white px-3 py-1.5 rounded-xl shadow-lg border border-slate-100 text-[10px] font-black tracking-widest text-slate-600">NOVO CLIENTE</span>
+                            <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-xl"><UserPlus size={20} /></div>
+                        </button>
+                        <button onClick={() => { setEditingAppt(null); setIsApptModalOpen(true); setIsFabOpen(false); }} className="group flex items-center gap-3">
+                            <span className="bg-white px-3 py-1.5 rounded-xl shadow-lg border border-slate-100 text-[10px] font-black tracking-widest text-slate-600">AGENDAR</span>
+                            <div className="w-14 h-14 bg-blue-600 text-white rounded-[1.2rem] flex items-center justify-center shadow-xl"><Plus size={24} strokeWidth={3} /></div>
+                        </button>
+                    </div>
+                )}
+                <button
+                    onClick={() => setIsFabOpen(!isFabOpen)}
+                    className={`w-16 h-16 rounded-3xl flex items-center justify-center shadow-2xl transition-all ${isFabOpen ? 'bg-slate-900 text-white rotate-45' : 'bg-blue-600 text-white'}`}
+                >
+                    <Plus size={36} strokeWidth={3} />
                 </button>
             </div>
-        )}
-        <button
-            onClick={() => setIsFabOpen(!isFabOpen)}
-            className={`w-16 h-16 rounded-3xl flex items-center justify-center shadow-2xl transition-all ${isFabOpen ? 'bg-slate-900 text-white rotate-45' : 'bg-blue-600 text-white'}`}
-        >
-            <Plus size={36} strokeWidth={3} />
-        </button>
-    </div>
 
-    {/* Modals */ }
-    {
-        isManageClientsOpen && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-                <div className="bg-white rounded-[2.5rem] w-full max-w-2xl h-[80vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95">
-                    <div className="p-6 bg-gradient-to-r from-slate-900 to-blue-900 text-white flex justify-between items-center">
-                        <div>
-                            <h3 className="text-xl font-black">Gerenciar Clientes</h3>
-                            <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest leading-none mt-1">Sua lista de contatos</p>
+            {/* Modals */}
+            {
+                isManageClientsOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                        <div className="bg-white rounded-[2.5rem] w-full max-w-2xl h-[80vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95">
+                            <div className="p-6 bg-gradient-to-r from-slate-900 to-blue-900 text-white flex justify-between items-center">
+                                <div>
+                                    <h3 className="text-xl font-black">Gerenciar Clientes</h3>
+                                    <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest leading-none mt-1">Sua lista de contatos</p>
+                                </div>
+                                <button onClick={() => { setIsManageClientsOpen(false); setClientSearchTerm(''); }} className="p-2 hover:bg-white/10 rounded-full transition-all"><X /></button>
+                            </div>
+
+                            <div className="p-4 border-b border-slate-100 bg-slate-50/50">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar por nome ou endereço..."
+                                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-blue-500 transition-all"
+                                        value={clientSearchTerm}
+                                        onChange={(e) => setClientSearchTerm(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/30">
+                                {clients.filter(c => (c.name || '').toLowerCase().includes(clientSearchTerm.toLowerCase()) || (c.address || '').toLowerCase().includes(clientSearchTerm.toLowerCase())).map(client => (
+                                    <div key={client.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-blue-200 transition-all">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-sm font-black">
+                                                {client.name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xs font-black text-slate-900">{client.name}</h4>
+                                                <p className="text-[10px] font-bold text-slate-400 truncate max-w-[200px] sm:max-w-xs">{client.address}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                onClick={() => {
+                                                    setEditingClient(client);
+                                                    setIsClientModalOpen(true);
+                                                }}
+                                                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                            >
+                                                <Edit2 size={16} />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm('Deseja realmente excluir este cliente?')) {
+                                                        // Aqui chamaria a função deleteClient que já existe ou deve ser verificada
+                                                        api.marine.deleteClient(client.id).then(() => fetchData());
+                                                    }
+                                                }}
+                                                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="p-4 bg-white border-t border-slate-100">
+                                <button
+                                    onClick={() => { setEditingClient(null); setIsClientModalOpen(true); }}
+                                    className="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/20"
+                                >
+                                    + Adicionar Novo Cliente
+                                </button>
+                            </div>
                         </div>
-                        <button onClick={() => { setIsManageClientsOpen(false); setClientSearchTerm(''); }} className="p-2 hover:bg-white/10 rounded-full transition-all"><X /></button>
                     </div>
-
-                    <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                            <input
-                                type="text"
-                                placeholder="Buscar por nome ou endereço..."
-                                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-blue-500 transition-all"
-                                value={clientSearchTerm}
-                                onChange={(e) => setClientSearchTerm(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/30">
-                        {clients.filter(c => (c.name || '').toLowerCase().includes(clientSearchTerm.toLowerCase()) || (c.address || '').toLowerCase().includes(clientSearchTerm.toLowerCase())).map(client => (
-                            <div key={client.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-blue-200 transition-all">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-sm font-black">
-                                        {client.name.charAt(0)}
+                )
+            }
+            {
+                isClientModalOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                        <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95">
+                            <div className="p-6 bg-gradient-to-r from-blue-700 to-blue-900 text-white flex justify-between items-center">
+                                <h3 className="text-xl font-black">{editingClient ? 'Editar Cliente' : 'Novo Cliente'}</h3>
+                                <button onClick={() => setIsClientModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-all"><X /></button>
+                            </div>
+                            <form onSubmit={handleAddClient} className="p-6 space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Nome Completo</label>
+                                    <input name="name" defaultValue={editingClient?.name} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" placeholder="Mariane Miranda" />
+                                </div>
+                                <div className="grid grid-cols-1 gap-4">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Telefone / WhatsApp</label>
+                                        <input name="phone" defaultValue={editingClient?.phone} className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" placeholder="(00) 00000-0000" />
                                     </div>
                                     <div>
-                                        <h4 className="text-xs font-black text-slate-900">{client.name}</h4>
-                                        <p className="text-[10px] font-bold text-slate-400 truncate max-w-[200px] sm:max-w-xs">{client.address}</p>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Endereço</label>
+                                        <input name="address" defaultValue={editingClient?.address} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" placeholder="Rua das Garças, 123" />
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                    <button
-                                        onClick={() => {
-                                            setEditingClient(client);
-                                            setIsClientModalOpen(true);
-                                        }}
-                                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                                    >
-                                        <Edit2 size={16} />
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            if (confirm('Deseja realmente excluir este cliente?')) {
-                                                // Aqui chamaria a função deleteClient que já existe ou deve ser verificada
-                                                api.marine.deleteClient(client.id).then(() => fetchData());
-                                            }
-                                        }}
-                                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Observações / Preferências</label>
+                                    <textarea name="notes" defaultValue={editingClient?.notes} className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" rows={3} placeholder="Tem cachorro, prefere produtos sem cheiro..." />
                                 </div>
-                            </div>
-                        ))}
+                                <button type="submit" className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all mt-4 uppercase tracking-widest text-sm">
+                                    {editingClient ? 'Salvar Alterações' : 'Cadastrar Cliente'}
+                                </button>
+                            </form>
+                        </div>
                     </div>
+                )
+            }
 
-                    <div className="p-4 bg-white border-t border-slate-100">
-                        <button
-                            onClick={() => { setEditingClient(null); setIsClientModalOpen(true); }}
-                            className="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/20"
-                        >
-                            + Adicionar Novo Cliente
-                        </button>
+            {
+                isApptModalOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                        <div className="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95">
+                            <div className="p-6 bg-gradient-to-r from-blue-700 to-blue-900 text-white flex justify-between items-center">
+                                <h3 className="text-xl font-black">{editingAppt?.id ? 'Editar Agendamento' : 'Agendar Faxina'}</h3>
+                                <button onClick={() => setIsApptModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-all"><X /></button>
+                            </div>
+                            <form onSubmit={handleAddAppt} className="p-6 space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Cliente</label>
+                                    <select name="client_id" defaultValue={editingAppt?.client_id} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all">
+                                        <option value="">Selecione um cliente...</option>
+                                        {clients.map(c => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="col-span-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Data</label>
+                                        <input type="date" name="date" defaultValue={editingAppt?.date} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Hora Início</label>
+                                        <input type="time" name="start_time" defaultValue={editingAppt?.start_time} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Hora Término</label>
+                                        <input type="time" name="end_time" defaultValue={editingAppt?.end_time} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 gap-4">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Valor do Serviço (R$)</label>
+                                        <input type="number" step="0.01" name="amount" defaultValue={editingAppt?.amount} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" placeholder="150,00" />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Notas / Tarefas</label>
+                                        <input name="notes" defaultValue={editingAppt?.notes} className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" placeholder="Focar na cozinha, passar pano..." />
+                                    </div>
+                                </div>
+                                <button type="submit" className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all mt-4 uppercase tracking-widest text-sm">
+                                    {editingAppt?.id ? 'Salvar Alterações' : 'Confirmar Agendamento'}
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            </div>
-        )
-    }
-    {
-        isClientModalOpen && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-                <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95">
-                    <div className="p-6 bg-gradient-to-r from-blue-700 to-blue-900 text-white flex justify-between items-center">
-                        <h3 className="text-xl font-black">{editingClient ? 'Editar Cliente' : 'Novo Cliente'}</h3>
-                        <button onClick={() => setIsClientModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-all"><X /></button>
-                    </div>
-                    <form onSubmit={handleAddClient} className="p-6 space-y-4">
-                        <div>
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Nome Completo</label>
-                            <input name="name" defaultValue={editingClient?.name} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" placeholder="Mariane Miranda" />
-                        </div>
-                        <div className="grid grid-cols-1 gap-4">
-                            <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Telefone / WhatsApp</label>
-                                <input name="phone" defaultValue={editingClient?.phone} className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" placeholder="(00) 00000-0000" />
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Endereço</label>
-                                <input name="address" defaultValue={editingClient?.address} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" placeholder="Rua das Garças, 123" />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Observações / Preferências</label>
-                            <textarea name="notes" defaultValue={editingClient?.notes} className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" rows={3} placeholder="Tem cachorro, prefere produtos sem cheiro..." />
-                        </div>
-                        <button type="submit" className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all mt-4 uppercase tracking-widest text-sm">
-                            {editingClient ? 'Salvar Alterações' : 'Cadastrar Cliente'}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        )
-    }
-
-    {
-        isApptModalOpen && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-                <div className="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95">
-                    <div className="p-6 bg-gradient-to-r from-blue-700 to-blue-900 text-white flex justify-between items-center">
-                        <h3 className="text-xl font-black">{editingAppt?.id ? 'Editar Agendamento' : 'Agendar Faxina'}</h3>
-                        <button onClick={() => setIsApptModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-all"><X /></button>
-                    </div>
-                    <form onSubmit={handleAddAppt} className="p-6 space-y-4">
-                        <div>
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Cliente</label>
-                            <select name="client_id" defaultValue={editingAppt?.client_id} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all">
-                                <option value="">Selecione um cliente...</option>
-                                {clients.map(c => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="col-span-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Data</label>
-                                <input type="date" name="date" defaultValue={editingAppt?.date} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" />
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Hora Início</label>
-                                <input type="time" name="start_time" defaultValue={editingAppt?.start_time} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" />
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Hora Término</label>
-                                <input type="time" name="end_time" defaultValue={editingAppt?.end_time} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 gap-4">
-                            <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Valor do Serviço (R$)</label>
-                                <input type="number" step="0.01" name="amount" defaultValue={editingAppt?.amount} required className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" placeholder="150,00" />
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Notas / Tarefas</label>
-                                <input name="notes" defaultValue={editingAppt?.notes} className="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none focus:border-blue-500 transition-all" placeholder="Focar na cozinha, passar pano..." />
-                            </div>
-                        </div>
-                        <button type="submit" className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all mt-4 uppercase tracking-widest text-sm">
-                            {editingAppt?.id ? 'Salvar Alterações' : 'Confirmar Agendamento'}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        )
-    }
-        </div >
+                )}
+        </div>
     );
 };
