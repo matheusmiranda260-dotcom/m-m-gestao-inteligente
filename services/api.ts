@@ -1,6 +1,4 @@
 
-
-
 import { supabase } from './supabase';
 import { FinancialData, Income, FixedExpense, CardTransaction } from '../types';
 
@@ -32,6 +30,7 @@ interface DBCardTransaction {
     total_installments: number;
     remaining_installments: number;
     purchase_date: string;
+    paid_installments: string; // JSON string
 }
 
 export const api = {
@@ -56,16 +55,20 @@ export const api = {
                 return null;
             }
 
+            const safeIncomes = incomes || [];
+            const safeFixed = fixedExpenses || [];
+            const safeCards = cardTransactions || [];
+
             // Mapeamento de snake_case para camelCase
             return {
-                incomes: (incomes as DBIncome[]).map(i => ({
+                incomes: (safeIncomes as DBIncome[]).map(i => ({
                     id: i.id,
                     description: i.description,
                     amount: i.amount,
                     source: i.source as any,
                     date: i.date
                 })),
-                fixedExpenses: (fixedExpenses as DBFixedExpense[]).map(e => ({
+                fixedExpenses: (safeFixed as DBFixedExpense[]).map(e => ({
                     id: e.id,
                     name: e.name,
                     amount: e.amount,
@@ -75,14 +78,22 @@ export const api = {
                     month: e.month,
                     year: e.year
                 })),
-                cardTransactions: (cardTransactions as DBCardTransaction[]).map(t => ({
+                cardTransactions: (safeCards as DBCardTransaction[]).map(t => ({
                     id: t.id,
                     description: t.description,
                     amount: t.amount,
                     provider: t.provider as any,
                     totalInstallments: t.total_installments,
                     remainingInstallments: t.remaining_installments,
-                    purchaseDate: t.purchase_date
+                    purchaseDate: t.purchase_date,
+                    paidInstallments: (() => {
+                        try {
+                            const parsed = t.paid_installments ? JSON.parse(t.paid_installments) : [];
+                            return Array.isArray(parsed) ? parsed : [];
+                        } catch {
+                            return [];
+                        }
+                    })()
                 }))
             };
         } catch (error) {
@@ -160,7 +171,8 @@ export const api = {
                 provider: transaction.provider,
                 total_installments: transaction.totalInstallments,
                 remaining_installments: transaction.remainingInstallments,
-                purchase_date: transaction.purchaseDate
+                purchase_date: transaction.purchaseDate,
+                paid_installments: '[]'
             }])
             .select()
             .single();
@@ -177,7 +189,15 @@ export const api = {
             provider: t.provider as any,
             totalInstallments: t.total_installments,
             remainingInstallments: t.remaining_installments,
-            purchaseDate: t.purchase_date
+            purchaseDate: t.purchase_date,
+            paidInstallments: (() => {
+                try {
+                    const parsed = t.paid_installments ? JSON.parse(t.paid_installments) : [];
+                    return Array.isArray(parsed) ? parsed : [];
+                } catch {
+                    return [];
+                }
+            })()
         };
     },
 
@@ -230,6 +250,7 @@ export const api = {
         if (updates.totalInstallments !== undefined) dbUpdates.total_installments = updates.totalInstallments;
         if (updates.remainingInstallments !== undefined) dbUpdates.remaining_installments = updates.remainingInstallments;
         if (updates.purchaseDate !== undefined) dbUpdates.purchase_date = updates.purchaseDate;
+        if (updates.paidInstallments !== undefined) dbUpdates.paid_installments = JSON.stringify(updates.paidInstallments);
 
         const { error } = await supabase
             .from('card_transactions')
@@ -276,4 +297,3 @@ export const api = {
         }
     }
 };
-

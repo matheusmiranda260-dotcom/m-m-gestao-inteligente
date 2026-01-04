@@ -137,12 +137,14 @@ const App: React.FC = () => {
         const currentMonthTotal = monthIndex + year * 12;
         const diff = currentMonthTotal - startMonthTotal;
         if (diff >= 0 && diff < t.totalInstallments) {
-          const installmentValue = (t.amount / t.totalInstallments);
+          const installmentValue = (t.amount / (t.totalInstallments || 1));
+          const isPaid = t.paidInstallments?.includes(diff + 1);
 
           filteredCards.push({
             ...t,
             currentInstallment: diff + 1,
-            installmentValue
+            installmentValue,
+            isPaid
           });
 
           if (t.provider === CardProvider.SANTANDER) {
@@ -155,10 +157,11 @@ const App: React.FC = () => {
 
 
       const totalCards = monthlyCardsSantander + monthlyCardsML;
+      const pendingCards = filteredCards.filter(c => !c.isPaid).reduce((acc, c) => acc + c.installmentValue, 0);
 
       return {
         monthIndex, monthName, income: monthlyIncomes, fixed: monthlyFixed,
-        pendingFixed, cardsSantander: monthlyCardsSantander, cardsML: monthlyCardsML, cards: totalCards, balance: monthlyIncomes - (monthlyFixed + totalCards),
+        pendingFixed, pendingCards, cardsSantander: monthlyCardsSantander, cardsML: monthlyCardsML, cards: totalCards, balance: monthlyIncomes - (monthlyFixed + totalCards),
         filteredFixed, filteredCards, filteredIncomes: data.incomes.filter(i => {
           const d = new Date(i.date);
           return d.getMonth() === monthIndex && d.getFullYear() === year;
@@ -297,6 +300,29 @@ const App: React.FC = () => {
 
     // Debounce poderia ser adicionado aqui, mas atualização direta por enquanto
     await api.updateFixedExpense(id, { amount });
+  };
+
+  const toggleCardInstallment = async (id: string, installment: number) => {
+    const transaction = data.cardTransactions.find(t => t.id === id);
+    if (!transaction) return;
+
+    const currentPaid = transaction.paidInstallments || [];
+    const isPaid = currentPaid.includes(installment);
+
+    const newPaid = isPaid
+      ? currentPaid.filter(i => i !== installment)
+      : [...currentPaid, installment];
+
+    // Optimistic update
+    setData(prev => ({
+      ...prev,
+      cardTransactions: prev.cardTransactions.map(t =>
+        t.id === id ? { ...t, paidInstallments: newPaid } : t
+      )
+    }));
+
+    const success = await api.updateCardTransaction(id, { paidInstallments: newPaid });
+    if (!success) fetchSafely();
   };
 
   const deleteTransaction = async (type: 'card' | 'income' | 'fixed', id: string) => {
@@ -591,7 +617,7 @@ const App: React.FC = () => {
                 </div>
                 <div className="bg-white p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-slate-100 col-span-2 md:col-span-1">
                   <p className="text-[8px] md:text-xs font-black text-red-500 uppercase mb-1 tracking-widest">Pendências</p>
-                  <p className="text-xs md:text-2xl font-black text-slate-900">R$ {selectedDetails.pendingFixed.toFixed(2)}</p>
+                  <p className="text-xs md:text-2xl font-black text-slate-900">R$ {(selectedDetails.pendingFixed + selectedDetails.pendingCards).toFixed(2)}</p>
                 </div>
               </div>
 
@@ -658,11 +684,16 @@ const App: React.FC = () => {
                   <div className="space-y-2">
                     {selectedDetails.filteredCards.map(card => (
                       <div key={card.id} className="flex justify-between items-center p-3 md:p-4 rounded-xl bg-orange-50/30 border border-orange-100 hover:bg-orange-50 transition-all">
-                        <div className="overflow-hidden">
-                          <div className={`text-[7px] md:text-[9px] font-black uppercase mb-0.5 ${card.provider === 'Santander' ? 'text-orange-600' : 'text-yellow-600'}`}>
-                            {card.provider} <span className="text-slate-400">• {card.currentInstallment}/{card.totalInstallments}</span>
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <button onClick={() => toggleCardInstallment(card.id, card.currentInstallment)} className="shrink-0 hover:scale-110 transition-transform">
+                            {card.isPaid ? <CheckCircle className="text-emerald-500 md:w-5 md:h-5" size={20} /> : <Circle className="text-slate-200 md:w-5 md:h-5" size={20} />}
+                          </button>
+                          <div className="overflow-hidden">
+                            <div className={`text-[7px] md:text-[9px] font-black uppercase mb-0.5 ${card.provider === 'Santander' ? 'text-orange-600' : 'text-yellow-600'}`}>
+                              {card.provider} <span className="text-slate-400">• {card.currentInstallment}/{card.totalInstallments}</span>
+                            </div>
+                            <div className="font-bold text-[10px] md:text-sm text-slate-800 leading-tight truncate">{card.description}</div>
                           </div>
-                          <div className="font-bold text-[10px] md:text-sm text-slate-800 leading-tight truncate">{card.description}</div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="font-black text-[10px] md:text-sm text-slate-900">R$ {card.installmentValue.toFixed(2)}</span>

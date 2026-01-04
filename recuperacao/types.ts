@@ -35,7 +35,6 @@ export interface CardTransaction {
   totalInstallments: number;
   remainingInstallments: number;
   purchaseDate: string;
-  paidInstallments?: number[];
 }
 
 export interface FixedExpense {
