@@ -211,22 +211,22 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                         </div>
                     </div>
 
-                    <div className="flex bg-slate-100 p-1 rounded-xl">
+                    <div className="flex bg-slate-100 p-1 rounded-xl shrink-0">
                         <button
                             onClick={() => setView('CALENDAR')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${view === 'CALENDAR' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-[11px] md:text-sm font-bold transition-all ${view === 'CALENDAR' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
                         >
-                            <CalendarIcon size={16} /> Agenda
+                            <CalendarIcon size={16} /> <span className="hidden xs:inline">Agenda</span>
                         </button>
                         <button
                             onClick={() => setView('CLIENTS')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${view === 'CLIENTS' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-[11px] md:text-sm font-bold transition-all ${view === 'CLIENTS' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
                         >
-                            <Users size={16} /> Clientes
+                            <Users size={16} /> <span className="hidden xs:inline">Clientes</span>
                         </button>
                     </div>
 
-                    <div className="hidden md:flex items-center gap-3">
+                    <div className="hidden lg:flex items-center gap-3">
                         <button
                             onClick={() => setIsClientModalOpen(true)}
                             className="px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center gap-2"
@@ -246,33 +246,17 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {view === 'CALENDAR' ? (
                     <div className="space-y-6">
-                        {/* Summary Stats */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Previsto</p>
-                                <p className="text-3xl font-black text-blue-600">R$ {weeklyStats.total.toFixed(2)}</p>
-                            </div>
-                            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Recebido</p>
-                                <p className="text-3xl font-black text-emerald-500">R$ {weeklyStats.paid.toFixed(2)}</p>
-                            </div>
-                            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pendente</p>
-                                <p className="text-3xl font-black text-orange-500">R$ {weeklyStats.pending.toFixed(2)}</p>
-                            </div>
-                        </div>
-
                         {/* Filters & Control */}
-                        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-xl border border-slate-100">
+                        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-xl border border-slate-100 w-full sm:w-auto overflow-hidden">
                                     <button onClick={() => {
                                         const newDate = new Date(currentDate);
                                         if (filterType === 'WEEK') newDate.setDate(newDate.getDate() - 7);
                                         else newDate.setMonth(newDate.getMonth() - 1);
                                         setCurrentDate(newDate);
-                                    }} className="p-2 hover:bg-white rounded-lg transition-all"><ChevronLeft size={16} /></button>
-                                    <span className="px-4 font-bold text-sm min-w-[120px] text-center capitalize">
+                                    }} className="p-2 hover:bg-white rounded-lg transition-all shrink-0"><ChevronLeft size={16} /></button>
+                                    <span className="flex-1 px-4 font-bold text-[11px] md:text-sm min-w-[120px] text-center capitalize overflow-hidden text-ellipsis whitespace-nowrap">
                                         {filterType === 'WEEK' ? `Semana de ${currentDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}` : currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
                                     </span>
                                     <button onClick={() => {
@@ -280,36 +264,49 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
                                         if (filterType === 'WEEK') newDate.setDate(newDate.getDate() + 7);
                                         else newDate.setMonth(newDate.getMonth() + 1);
                                         setCurrentDate(newDate);
-                                    }} className="p-2 hover:bg-white rounded-lg transition-all"><ChevronRight size={16} /></button>
+                                    }} className="p-2 hover:bg-white rounded-lg transition-all shrink-0"><ChevronRight size={16} /></button>
                                 </div>
-                                <select
-                                    value={filterType}
-                                    onChange={(e) => setFilterType(e.target.value as any)}
-                                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold outline-none focus:border-blue-500 transition-all"
-                                >
-                                    <option value="WEEK">Visão Semanal (Grade)</option>
-                                    <option value="MONTH">Visão Mensal (Lista)</option>
-                                    <option value="ALL">Ver Tudo</option>
-                                </select>
+                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                                    <select
+                                        value={filterType}
+                                        onChange={(e) => setFilterType(e.target.value as any)}
+                                        className="flex-1 sm:w-[180px] bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-blue-500 transition-all"
+                                    >
+                                        <option value="WEEK">Visão Semanal (Grade)</option>
+                                        <option value="MONTH">Visão Mensal (Lista)</option>
+                                        <option value="ALL">Ver Tudo</option>
+                                    </select>
+
+                                    <div className="flex items-center gap-2">
+                                        <div className="px-3 py-1 bg-blue-50 border border-blue-100 rounded-xl flex flex-col items-center justify-center min-w-[70px]">
+                                            <span className="text-[7px] font-black text-blue-400 uppercase leading-none mb-0.5">Previsto</span>
+                                            <span className="text-[10px] font-black text-blue-600 leading-none">R$ {weeklyStats.total.toFixed(0)}</span>
+                                        </div>
+                                        <div className="px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-xl flex flex-col items-center justify-center min-w-[70px]">
+                                            <span className="text-[7px] font-black text-emerald-400 uppercase leading-none mb-0.5">Recebido</span>
+                                            <span className="text-[10px] font-black text-emerald-600 leading-none">R$ {weeklyStats.paid.toFixed(0)}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="flex flex-1 max-w-md w-full gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2 w-full">
                                 <div className="relative flex-1">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                     <input
                                         type="text"
-                                        placeholder="Buscar por cliente ou obs..."
+                                        placeholder="Buscar..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 transition-all"
+                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 transition-all"
                                     />
                                 </div>
                                 <select
                                     value={selectedClientFilter}
                                     onChange={(e) => setSelectedClientFilter(e.target.value)}
-                                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold outline-none focus:border-blue-500 transition-all"
+                                    className="w-full sm:w-[150px] bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-blue-500 transition-all"
                                 >
-                                    <option value="ALL">Todos Clientes</option>
+                                    <option value="ALL">Clientes</option>
                                     {clients.map(c => (
                                         <option key={c.id} value={c.id}>{c.name}</option>
                                     ))}
@@ -319,13 +316,13 @@ export const MarineHomeClear: React.FC<MarineHomeClearProps> = ({ onBack }) => {
 
                         {/* Weekly Grid View */}
                         {filterType === 'WEEK' ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                            <div className="flex lg:grid lg:grid-cols-6 gap-4 overflow-x-auto pb-4 lg:pb-0 snap-x snap-mandatory">
                                 {weekDays.map((day, idx) => {
                                     const dayNum = idx + 1;
                                     const dayAppts = appointmentsByDay[dayNum] || [];
                                     const dateStr = day.date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
                                     return (
-                                        <div key={day.name} className="bg-white rounded-[2rem] border border-slate-200 shadow-sm flex flex-col overflow-hidden min-h-[400px]">
+                                        <div key={day.name} className="flex-none w-[85vw] sm:w-[300px] lg:w-auto bg-white rounded-[2rem] border border-slate-200 shadow-sm flex flex-col overflow-hidden min-h-[450px] snap-center">
                                             <div className="p-4 bg-slate-900 text-white text-center">
                                                 <h4 className="font-black uppercase tracking-widest text-[10px] opacity-60 leading-none mb-1">{day.name}</h4>
                                                 <div className="text-sm font-black tracking-tighter">{dateStr}</div>
