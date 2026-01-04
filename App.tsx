@@ -6,11 +6,23 @@ import { GestaoInteligente } from './GestaoInteligente';
 import { MarineHomeClear } from './MarineHomeClear';
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loggedUser, setLoggedUser] = useState<string | null>(null);
   const [currentProject, setCurrentProject] = useState<'GESTO' | 'MARINE' | null>(null);
 
-  if (!isAuthenticated) {
-    return <Login onLogin={() => setIsAuthenticated(true)} />;
+  const handleLogin = (user: string) => {
+    setLoggedUser(user);
+    if (user === 'mariane') {
+      setCurrentProject('MARINE');
+    }
+  };
+
+  const handleLogout = () => {
+    setLoggedUser(null);
+    setCurrentProject(null);
+  };
+
+  if (!loggedUser) {
+    return <Login onLogin={handleLogin} />;
   }
 
   if (!currentProject) {
@@ -22,7 +34,7 @@ const App: React.FC = () => {
   }
 
   if (currentProject === 'MARINE') {
-    return <MarineHomeClear onBack={() => setCurrentProject(null)} />;
+    return <MarineHomeClear onBack={loggedUser === 'mariane' ? handleLogout : () => setCurrentProject(null)} />;
   }
 
   return null;

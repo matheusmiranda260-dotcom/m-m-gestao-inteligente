@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Lock, User, ArrowRight, ShieldCheck } from 'lucide-react';
 
 interface LoginProps {
-    onLogin: () => void;
+    onLogin: (username: string) => void;
 }
 
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
@@ -19,8 +19,13 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
         // Simulação de delay para sensação premium
         setTimeout(() => {
-            if (username === 'gestor' && password === '070223') {
-                onLogin();
+            const validUsers: Record<string, string> = {
+                'gestor': '070223',
+                'mariane': '250311'
+            };
+
+            if (validUsers[username.toLowerCase()] === password) {
+                onLogin(username.toLowerCase());
             } else {
                 setError('Credenciais inválidas. Tente novamente.');
                 setIsLoading(false);
