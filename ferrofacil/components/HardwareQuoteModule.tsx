@@ -112,22 +112,24 @@ const HardwareQuoteModule: React.FC = () => {
     if (isSelectingClient) {
       return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setIsSelectingClient(false)}></div>
-          <div className="bg-white rounded-[2rem] w-full max-w-xl shadow-2xl relative z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="bg-slate-50 p-6 border-b border-slate-100">
-              <h2 className="text-2xl font-black text-slate-800">Novo Orçamento</h2>
-              <div className="flex bg-slate-200 p-1 rounded-xl mt-4">
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setIsSelectingClient(false)}></div>
+          <div className="glass rounded-[2.5rem] w-full max-w-xl shadow-2xl relative z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+            <div className="bg-white/5 p-8 border-b border-white/10">
+              <h2 className="text-3xl font-black text-white tracking-tighter">Novo Orçamento</h2>
+              <p className="text-slate-400 text-sm mt-1">Selecione como deseja iniciar a cotação.</p>
+
+              <div className="flex bg-slate-800/50 p-1.5 rounded-2xl mt-8">
                 <button
                   onClick={() => setQuoteMode('registered')}
-                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${quoteMode === 'registered' ? 'bg-white text-amber-600 shadow-sm' : 'text-slate-500'}`}
+                  className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all ${quoteMode === 'registered' ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
                 >
-                  Clientes Cadastrados
+                  Clientes
                 </button>
                 <button
                   onClick={() => setQuoteMode('counter')}
-                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${quoteMode === 'counter' ? 'bg-white text-amber-600 shadow-sm' : 'text-slate-500'}`}
+                  className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all ${quoteMode === 'counter' ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
                 >
-                  Consumidor Balcão
+                  Balcão
                 </button>
               </div>
             </div>
@@ -135,23 +137,33 @@ const HardwareQuoteModule: React.FC = () => {
             <div className="p-8">
               {quoteMode === 'registered' ? (
                 <>
-                  <p className="text-slate-500 mb-6 font-medium text-sm">Selecione um cliente da sua base de dados:</p>
-                  <div className="max-h-60 overflow-y-auto space-y-2 mb-8 pr-2 custom-scrollbar">
+                  <div className="max-h-[400px] overflow-y-auto space-y-3 mb-8 pr-2 custom-scrollbar">
                     {clients.length === 0 ? (
-                      <div className="text-center py-8 text-slate-400 border border-dashed rounded-2xl">
-                        Nenhum cliente cadastrado.
+                      <div className="text-center py-12 px-6 rounded-3xl bg-white/5 border border-dashed border-white/10">
+                        <p className="text-slate-500 font-bold">Nenhum cliente disponível.</p>
+                        <button
+                          onClick={() => { setIsSelectingClient(false); setActiveTab('clients'); }}
+                          className="mt-4 text-orange-500 font-black text-xs uppercase tracking-widest hover:underline"
+                        >
+                          Cadastrar Primeiro +
+                        </button>
                       </div>
                     ) : (
                       clients.map(c => (
                         <button
                           key={c.id}
                           onClick={() => handleSelectClient(c)}
-                          className="w-full text-left p-4 rounded-2xl border border-slate-100 hover:border-amber-500 hover:bg-amber-50 transition-all font-bold text-slate-700 flex justify-between items-center group"
+                          className="w-full text-left p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-orange-500/50 hover:bg-white/10 transition-all group flex justify-between items-center"
                         >
-                          {c.name}
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 opacity-0 group-hover:opacity-100 text-amber-500 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                          <div>
+                            <p className="font-black text-white group-hover:text-orange-500 transition-colors uppercase tracking-tight">{c.name}</p>
+                            <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase">{c.phone}</p>
+                          </div>
+                          <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-orange-500 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
                         </button>
                       ))
                     )}
@@ -159,51 +171,50 @@ const HardwareQuoteModule: React.FC = () => {
                 </>
               ) : (
                 <div className="space-y-4 mb-8">
-                  <p className="text-slate-500 font-medium text-sm">Venda rápida sem cadastro prévio:</p>
-                  <div className="space-y-3">
-                    <input
-                      type="text"
-                      placeholder="Nome do Cliente (Obrigatório)"
-                      value={counterData.name}
-                      onChange={e => setCounterData({ ...counterData, name: e.target.value })}
-                      className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none font-medium"
-                    />
-                    <input
-                      type="text"
-                      placeholder="WhatsApp / Telefone"
-                      value={counterData.phone}
-                      onChange={e => setCounterData({ ...counterData, phone: e.target.value })}
-                      className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none font-medium"
-                    />
-                    <textarea
-                      placeholder="Observações do pedido..."
-                      rows={3}
-                      value={counterData.obs}
-                      onChange={e => setCounterData({ ...counterData, obs: e.target.value })}
-                      className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none font-medium resize-none"
-                    ></textarea>
+                  <div className="space-y-4">
+                    <div className="relative group">
+                      <span className="absolute left-4 top-3 text-[10px] font-black text-slate-500 uppercase tracking-widest pointer-events-none group-focus-within:text-orange-500 transition-colors">Nome do Cliente</span>
+                      <input
+                        type="text"
+                        value={counterData.name}
+                        onChange={e => setCounterData({ ...counterData, name: e.target.value })}
+                        className="w-full pt-8 pb-3 px-4 rounded-2xl bg-white/5 border border-white/10 focus:border-orange-500 focus:bg-white/10 outline-none text-white font-bold transition-all"
+                      />
+                    </div>
+                    <div className="relative group">
+                      <span className="absolute left-4 top-3 text-[10px] font-black text-slate-500 uppercase tracking-widest pointer-events-none group-focus-within:text-orange-500 transition-colors">WhatsApp / Tel</span>
+                      <input
+                        type="text"
+                        value={counterData.phone}
+                        onChange={e => setCounterData({ ...counterData, phone: e.target.value })}
+                        className="w-full pt-8 pb-3 px-4 rounded-2xl bg-white/5 border border-white/10 focus:border-orange-500 focus:bg-white/10 outline-none text-white font-bold transition-all"
+                      />
+                    </div>
+                    <div className="relative group">
+                      <span className="absolute left-4 top-3 text-[10px] font-black text-slate-500 uppercase tracking-widest pointer-events-none group-focus-within:text-orange-500 transition-colors">Observações</span>
+                      <textarea
+                        rows={3}
+                        value={counterData.obs}
+                        onChange={e => setCounterData({ ...counterData, obs: e.target.value })}
+                        className="w-full pt-8 pb-3 px-4 rounded-2xl bg-white/5 border border-white/10 focus:border-orange-500 focus:bg-white/10 outline-none text-white font-bold transition-all resize-none"
+                      ></textarea>
+                    </div>
                   </div>
                   <button
                     onClick={handleStartCounterQuote}
-                    className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl shadow-slate-100"
+                    className="w-full premium-gradient text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] shadow-xl shadow-orange-500/20 active:scale-95 transition-all"
                   >
-                    Iniciar Orçamento Balcão
+                    Iniciar Orçamento
                   </button>
                 </div>
               )}
 
-              <div className="flex gap-4 border-t border-slate-50 pt-6">
+              <div className="flex gap-4 border-t border-white/5 pt-6 justify-center">
                 <button
                   onClick={() => setIsSelectingClient(false)}
-                  className="flex-1 py-3 font-bold text-slate-400 hover:text-slate-600 text-sm"
+                  className="px-6 py-3 font-black text-slate-500 hover:text-white text-xs uppercase tracking-widest transition-colors"
                 >
                   Cancelar
-                </button>
-                <button
-                  onClick={() => { setIsSelectingClient(false); setActiveTab('clients'); }}
-                  className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 text-sm"
-                >
-                  Gerenciar Clientes
                 </button>
               </div>
             </div>
@@ -223,56 +234,72 @@ const HardwareQuoteModule: React.FC = () => {
     }
 
     return (
+      <div className="space-y-10">
+        {/* Header Premium Redesenhado */}
+        <div className="relative rounded-[3rem] overflow-hidden group">
+          <div className="absolute inset-0 premium-gradient opacity-90"></div>
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/20 rounded-full blur-[100px] -mr-48 -mt-48 transition-all group-hover:scale-110 duration-1000"></div>
 
-      <>
-        {/* Header Premium */}
-        <div className="mb-8 flex flex-col md:flex-row justify-between items-center bg-gradient-to-br from-slate-900 to-slate-800 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -ml-32 -mb-32 pointer-events-none"></div>
-
-          <div className="relative z-10 flex items-center gap-6">
-            <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10 shadow-inner">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-              </svg>
+          <div className="relative z-10 p-10 md:p-14 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div className="flex-1 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 bg-black/20 backdrop-blur-md px-4 py-1.5 rounded-full mb-6 border border-white/10 shadow-inner">
+                <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+                <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Painel Operacional Ativo</span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-black text-white tracking-tighter leading-none">
+                Cálculo de <br /> <span className="text-black/30">Ferragens</span>
+              </h1>
+              <p className="text-white/70 font-bold text-lg mt-6 max-w-lg">
+                Módulo especializado em orçamentos técnicos e detalhamento de aço estrutural.
+              </p>
             </div>
-            <div>
-              <h1 className="text-3xl font-black text-white tracking-tight">Cálculo de Ferragens</h1>
-              <p className="text-slate-400 font-bold text-sm mt-1">Gerencie orçamentos, clientes e produção de aço.</p>
+
+            <div className="flex flex-col gap-4 w-full md:w-auto">
+              <button
+                onClick={handleNewQuoteClick}
+                className="bg-white text-orange-600 px-10 py-6 rounded-[2rem] font-black uppercase tracking-widest text-sm hover:bg-slate-100 hover:scale-[1.05] hover:shadow-2xl shadow-black/20 transition-all active:scale-95 flex items-center justify-center gap-3 group"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                </svg>
+                Novo Orçamento
+              </button>
+
+              <button
+                onClick={() => setActiveTab('clients')}
+                className="bg-black/20 backdrop-blur-md border border-white/10 text-white px-10 py-5 rounded-[2rem] font-bold uppercase tracking-widest text-xs hover:bg-black/40 transition-all flex items-center justify-center gap-3"
+              >
+                Gerenciar Clientes
+              </button>
             </div>
           </div>
-
-          <button
-            onClick={handleNewQuoteClick}
-            className="mt-6 md:mt-0 relative z-10 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-8 py-4 rounded-[2rem] font-black uppercase tracking-widest hover:shadow-lg hover:shadow-orange-500/30 transition-all active:scale-95 flex items-center gap-3"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-            </svg>
-            Novo Orçamento
-          </button>
         </div>
 
-        <QuoteList
-          quotes={quotes}
-          clients={clients}
-          onDelete={handleDeleteQuote}
-          onFinalize={handleFinalizeQuote}
-          onViewSummary={(quote) => setSummaryQuote(quote)}
-        />
+        <div className="px-2">
+          <QuoteList
+            quotes={quotes}
+            clients={clients}
+            onDelete={handleDeleteQuote}
+            onFinalize={handleFinalizeQuote}
+            onViewSummary={(quote) => setSummaryQuote(quote)}
+          />
+        </div>
+
         {summaryQuote && (
           <SteelSummary quote={summaryQuote} onClose={() => setSummaryQuote(null)} />
         )}
-      </>
+      </div>
     );
   };
 
   return (
-    <div className="min-h-full w-full mx-auto py-2">
+    <div className="min-h-full w-full mx-auto">
       {renderContent()}
     </div>
   );
 };
+
 
 export default HardwareQuoteModule;
 

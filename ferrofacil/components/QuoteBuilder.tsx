@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Construction } from 'lucide-react';
 import { DevSystemMap } from './DevSystemMap';
 import { analyzeImageWithGemini } from '../services/imageAnalysisService';
 import { ElementType, BarUsage, SteelItem, Client, Quote, MainBarGroup, HookType } from '../types';
@@ -2859,163 +2860,180 @@ const QuoteBuilder: React.FC<QuoteBuilderProps> = ({ client, onSave, onCancel })
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-20">
-      {/* Resumo do Orçamento */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
-        <div className="flex items-center gap-5">
-          <div className="p-4 bg-slate-900 text-amber-500 rounded-3xl shadow-xl">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-          </div>
-          <div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{client.name}</span>
-            <h2 className="text-3xl font-black text-slate-800 tracking-tighter">Orçamento de Ferragem</h2>
-          </div>
-        </div>
-        <div className="flex gap-6 items-center">
-          <button
-            onClick={() => setShowDevMap(true)}
-            className="p-3 bg-white text-slate-400 border border-slate-200 hover:border-blue-400 hover:text-blue-600 rounded-2xl transition-all shadow-sm group relative"
-            title="Mapa do Sistema"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" />
-            </svg>
-            <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Mapa do Sistema</span>
-          </button>
+    <div className="space-y-10 max-w-7xl mx-auto pb-32 animate-in fade-in duration-700">
+      {/* Resumo do Orçamento Premium */}
+      <div className="relative rounded-[3.5rem] overflow-hidden group">
+        <div className="absolute inset-0 bg-slate-900 opacity-90"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent"></div>
 
-          <div className="text-right">
-            <span className="text-[10px] font-black text-slate-400 uppercase block tracking-wider">Carga Total</span>
-            <span className="text-3xl font-black text-slate-900 tracking-tighter">{calculateWeight(items).toFixed(1)} <small className="text-sm font-medium">kg</small></span>
+        <div className="relative z-10 p-10 md:p-12 flex flex-col lg:flex-row justify-between items-center gap-10">
+          <div className="flex items-center gap-6">
+            <div className="p-6 bg-white/5 backdrop-blur-xl border border-white/10 text-orange-500 rounded-[2.5rem] shadow-2xl rotate-3 group-hover:rotate-0 transition-transform duration-500">
+              <Construction size={32} />
+            </div>
+            <div>
+              <span className="text-[10px] font-black text-orange-500 uppercase tracking-[0.3em] block mb-2">{client.name}</span>
+              <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter leading-none">Cote seu <br /><span className="text-slate-500">Projeto de Aço</span></h1>
+            </div>
           </div>
-          <button
-            disabled={items.length === 0 || !items.every(i => i.mainBars.length > 0 && i.hasStirrups)}
-            onClick={() => onSave({ id: crypto.randomUUID(), clientId: client.id, date: new Date().toISOString(), items: items, totalWeight: calculateWeight(items), totalPrice: calculateWeight(items) * DEFAULT_KG_PRICE, status: 'Draft' })}
-            className="bg-emerald-500 text-white px-10 py-4 rounded-3xl font-black hover:bg-emerald-600 transition-all shadow-xl disabled:opacity-40 active:scale-95"
-          >
-            Finalizar Orçamento
-          </button>
+
+          <div className="flex flex-col md:flex-row gap-8 items-center bg-black/20 p-8 rounded-[3rem] border border-white/5 backdrop-blur-md">
+            <div className="text-center md:text-right">
+              <span className="text-[10px] font-black text-slate-500 uppercase block tracking-[0.2em] mb-1">Peso Total Estimado</span>
+              <div className="flex items-baseline gap-2 justify-center md:justify-end">
+                <span className="text-5xl font-black text-white tracking-tighter tabular-nums">{calculateWeight(items).toFixed(1)}</span>
+                <span className="text-sm font-black text-slate-500 uppercase tracking-widest">kg</span>
+              </div>
+            </div>
+
+            <div className="w-px h-12 bg-white/10 hidden md:block"></div>
+
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowDevMap(true)}
+                className="w-14 h-14 glass flex items-center justify-center rounded-2xl text-slate-400 hover:text-white hover:bg-white/10 transition-all border border-white/5"
+              >
+                <div className="relative">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" />
+                  </svg>
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+                </div>
+              </button>
+
+              <button
+                disabled={items.length === 0 || !items.every(i => i.mainBars.length > 0 && i.hasStirrups)}
+                onClick={() => onSave({ id: crypto.randomUUID(), clientId: client.id, date: new Date().toISOString(), items: items, totalWeight: calculateWeight(items), totalPrice: calculateWeight(items) * DEFAULT_KG_PRICE, status: 'Draft' })}
+                className="premium-gradient text-white px-12 py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:scale-[1.05] transition-all shadow-[0_20px_40px_rgba(249,115,22,0.3)] disabled:opacity-20 active:scale-95"
+              >
+                Finalizar Orçamento
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       {showDevMap && <DevSystemMap onClose={() => setShowDevMap(false)} />}
 
-      <div className="space-y-4">
+      {/* Lista de Peças */}
+      <div className="grid grid-cols-1 gap-6">
         {items.map(item => {
           const hasMainBars = item.mainBars.length > 0;
           const hasStirrups = item.hasStirrups;
           const isComplete = hasMainBars && hasStirrups;
 
           return (
-            <div key={item.id} className={`bg-white p-8 rounded-[2.5rem] border-2 shadow-sm transition-all flex flex-col group hover:shadow-lg ${!isComplete ? 'border-amber-300 bg-amber-50/10' : 'border-slate-100 bg-white'}`}>
-              <div className="flex justify-between items-start w-full">
-                <div className="flex items-center gap-8">
-                  <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center font-black text-lg shadow-sm border ${!isComplete ? 'bg-amber-100 text-amber-600 border-amber-200' : 'bg-slate-100 text-slate-800 border-slate-200'}`}>
+            <div key={item.id} className="card-premium overflow-hidden group">
+              <div className="p-8 md:p-10 flex flex-col md:flex-row justify-between items-center gap-8">
+                <div className="flex items-center gap-8 w-full md:w-auto">
+                  <div className={`w-20 h-20 shrink-0 rounded-3xl flex items-center justify-center font-black text-2xl shadow-inner border rotate-3 transition-transform group-hover:rotate-0 duration-500 ${!isComplete ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : 'bg-white/5 text-white border-white/10'}`}>
                     {item.quantity}x
                   </div>
                   <div>
-                    <h4 className="font-black text-slate-900 text-xl uppercase tracking-tight flex items-center gap-3">
-                      {item.type}
-                      {!isComplete && <span className="text-[10px] font-bold bg-amber-100 text-amber-600 px-2 py-1 rounded-md uppercase tracking-wider">Incompleto</span>}
-                      {item.observation && <span className="text-slate-400 font-medium lowercase text-base"> - {item.observation}</span>}
-                    </h4>
-                    <div className="flex gap-3 items-center mt-1">
-                      <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">
-                        {item.type === ElementType.SAPATA
-                          ? `${Math.round(getEffectiveLength(item) * 100)}cm x ${Math.round(item.width! * 100)}cm x ${item.height}cm`
-                          : `${Math.round(getEffectiveLength(item) * 100)}cm de comprimento`}
-                      </span>
+                    <div className="flex flex-wrap items-center gap-3 mb-2">
+                      <h4 className="font-black text-white text-2xl tracking-tight uppercase">{item.type}</h4>
+                      {!isComplete && (
+                        <div className="bg-red-500/10 text-red-500 text-[9px] font-black px-3 py-1 rounded-full border border-red-500/20 uppercase tracking-[0.2em] animate-pulse">
+                          Pendente
+                        </div>
+                      )}
+                      {item.observation && (
+                        <span className="text-slate-500 font-bold bg-white/5 px-3 py-0.5 rounded-lg text-sm tracking-tight">{item.observation}</span>
+                      )}
                     </div>
-                    {/* Validation Feedback */}
+
+                    <div className="flex items-center gap-4 text-slate-500 font-black text-[10px] uppercase tracking-widest">
+                      <div className="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                        <span>
+                          {item.type === ElementType.SAPATA
+                            ? `${Math.round(getEffectiveLength(item) * 100)} x ${Math.round(item.width! * 100)} x ${item.height} cm`
+                            : `${Math.round(getEffectiveLength(item) * 100)} cm Comprimento`}
+                        </span>
+                      </div>
+                      <div className="w-1 h-1 rounded-full bg-white/10"></div>
+                      <span>Peso: {(calculateWeight([item])).toFixed(1)} kg</span>
+                    </div>
+
                     {!isComplete && (
-                      <div className="flex gap-2 mt-3">
-                        {!hasMainBars && <span className="text-[9px] font-black text-red-400 uppercase bg-red-50 px-2 py-1 rounded-lg border border-red-100">Falta Ferro Principal</span>}
-                        {!hasStirrups && <span className="text-[9px] font-black text-red-400 uppercase bg-red-50 px-2 py-1 rounded-lg border border-red-100">Falta Estribo</span>}
+                      <div className="flex gap-2 mt-4">
+                        {!hasMainBars && <span className="text-[9px] font-black text-red-400 uppercase bg-red-500/5 px-3 py-1 rounded-lg border border-red-500/10">Definir Ferragem</span>}
+                        {!hasStirrups && <span className="text-[9px] font-black text-red-400 uppercase bg-red-500/5 px-3 py-1 rounded-lg border border-red-500/10">Definir Estribo</span>}
                       </div>
                     )}
                   </div>
                 </div>
-                <div className="flex gap-3 relative">
-                  <div className="relative">
-                    <button
-                      onClick={() => setOpenDropdownId(openDropdownId === item.id ? null : item.id)}
-                      className={`px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 ${!isComplete ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-slate-900 text-white hover:bg-slate-800'}`}
-                    >
-                      {!isComplete && <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 animate-pulse" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>}
-                      {isComplete ? 'Editar Detalhes' : 'Configurar Aço'}
-                      <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${openDropdownId === item.id ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                    </button>
 
-                    {openDropdownId === item.id && (
-                      <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-in slide-in-from-top-2 fade-in duration-200">
-                        <div className="p-2 bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase text-slate-400 tracking-widest text-center">
-                          Opções da Peça
-                        </div>
-                        <div className="flex flex-col p-2 gap-1">
-                          <button
-                            onClick={() => { setEditingContext({ item, initialTab: 'ferros', initialUsage: BarUsage.PRINCIPAL }); setOpenDropdownId(null); }}
-                            className="text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-between group"
-                          >
-                            <span>Adicionar / Editar Ferros</span>
-                            <span className="text-[10px] bg-slate-100 text-slate-400 px-2 py-0.5 rounded group-hover:bg-amber-100 group-hover:text-amber-600 transition-colors">Abrir Editor</span>
-                          </button>
-
-                          <div className="h-px bg-slate-100 my-1" />
-
-                          <button
-                            onClick={() => { setViewingDetailedItem(item); setOpenDropdownId(null); }}
-                            className="text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-between group"
-                          >
-                            <span>Orçamento Detalhado</span>
-                            <span className="text-[10px] bg-slate-100 text-slate-400 px-2 py-0.5 rounded group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">NOVO</span>
-                          </button>
-
-                          <button
-                            onClick={() => {
-                              // Duplicar item logic? Or delete?
-                              // Assuming the list had delete but I don't see one in this dropdown block.
-                              // Let's add a Remove action if it wasn't there or if useful.
-                              // But for now, user asked to simplify "Add Components".
-                              setItems(items.filter(i => i.id !== item.id));
-                            }}
-                            className="text-left px-4 py-3 rounded-xl hover:bg-red-50 text-xs font-bold text-red-500 flex items-center justify-between group"
-                          >
-                            <span>Remover Peça</span>
-                            <span className="text-[10px] bg-red-100 text-red-500 px-2 py-0.5 rounded group-hover:bg-red-200 transition-colors">X</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <button onClick={() => setItems(items.filter(i => i.id !== item.id))} className="p-3 text-slate-200 hover:text-red-500 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                <div className="flex gap-4 w-full md:w-auto relative">
+                  <button
+                    onClick={() => setOpenDropdownId(openDropdownId === item.id ? null : item.id)}
+                    className={`flex-1 md:flex-none px-10 py-5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2 border ${!isComplete ? 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600' : 'bg-white/5 text-white border-white/5 hover:bg-white/10'}`}
+                  >
+                    {isComplete ? 'Ajustar Detalhes' : 'Configurar'}
+                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${openDropdownId === item.id ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
                   </button>
+
+                  <button
+                    onClick={() => setItems(items.filter(i => i.id !== item.id))}
+                    className="w-14 h-14 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 rounded-2xl transition-all flex items-center justify-center shrink-0"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+
+                  {openDropdownId === item.id && (
+                    <div className="absolute top-full right-0 mt-4 w-72 glass-dark rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 z-[100] overflow-hidden animate-in slide-in-from-top-4 fade-in duration-300">
+                      <div className="p-4 bg-white/5 border-b border-white/5 text-[9px] font-black uppercase text-slate-500 tracking-[0.2em] text-center">
+                        Ações Profissionais
+                      </div>
+                      <div className="p-3 grid grid-cols-1 gap-2">
+                        <button onClick={() => { setEditingContext({ item, initialTab: 'ferros', initialUsage: BarUsage.PRINCIPAL }); setOpenDropdownId(null); }} className="w-full text-left p-4 rounded-2xl hover:bg-orange-600 hover:text-white text-slate-300 transition-all font-bold text-xs flex items-center gap-3 group/opt">
+                          <span className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-500 group-hover/opt:bg-white/20 transition-colors">F</span>
+                          Bancada de Ferragem
+                        </button>
+                        <button
+                          onClick={() => {
+                            setViewingDetailedItem(item);
+                            setOpenDropdownId(null);
+                          }}
+                          className="w-full text-left p-4 rounded-2xl hover:bg-white/10 text-slate-300 transition-all font-bold text-xs flex items-center gap-3 group/opt"
+                        >
+                          <span className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-500 group-hover/opt:bg-white/20">📋</span>
+                          Visualizar Corte
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-              <ItemReinforcementPreview
-                item={item}
-                onEditBar={(idx) => setEditingContext({ item, barIdx: idx, initialTab: 'ferros' })}
-                onRemoveBar={(idx) => {
-                  const newBars = item.mainBars.filter((_, i) => i !== idx);
-                  setItems(items.map(it => it.id === item.id ? { ...it, mainBars: newBars, isConfigured: newBars.length > 0 || it.hasStirrups } : it));
-                }}
-                onEditStirrups={() => setEditingContext({ item, initialTab: 'estribos' })}
-                onBarUpdate={(idx, offset) => {
-                  const newBars = [...item.mainBars];
-                  if (newBars[idx]) {
-                    newBars[idx] = { ...newBars[idx], offset };
-                    const newItem = { ...item, mainBars: newBars };
-                    setItems(items.map(it => it.id === item.id ? newItem : it));
-                  }
-                }}
-              />
+
+              <div className="px-8 pb-8">
+                <ItemReinforcementPreview
+                  item={item}
+                  onEditBar={(idx) => setEditingContext({ item, barIdx: idx, initialTab: 'ferros' })}
+                  onRemoveBar={(idx) => {
+                    const newBars = item.mainBars.filter((_, i) => i !== idx);
+                    setItems(items.map(it => it.id === item.id ? { ...it, mainBars: newBars, isConfigured: newBars.length > 0 || it.hasStirrups } : it));
+                  }}
+                  onEditStirrups={() => setEditingContext({ item, initialTab: 'estribos' })}
+                  onBarUpdate={(idx, offset) => {
+                    const newBars = [...item.mainBars];
+                    if (newBars[idx]) {
+                      newBars[idx] = { ...newBars[idx], offset };
+                      const newItem = { ...item, mainBars: newBars };
+                      setItems(items.map(it => it.id === item.id ? newItem : it));
+                    }
+                  }}
+                />
+              </div>
             </div>
           );
         })}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
           {/* Import via AI Button */}
-          <label className={`w-full py-10 bg-white border-4 border-dashed border-indigo-100 rounded-[3rem] text-indigo-400 font-black uppercase tracking-widest hover:border-indigo-400 hover:text-indigo-600 transition-all active:scale-[0.99] flex items-center justify-center gap-4 group cursor-pointer relative overflow-hidden ${isAnalyzing ? 'opacity-50 pointer-events-none' : ''}`}>
+          <label className={`group relative w-full py-14 overflow-hidden rounded-[3.5rem] flex flex-col items-center justify-center gap-6 cursor-pointer border-2 border-dashed border-white/10 hover:border-orange-500/50 bg-white/5 hover:bg-white/10 transition-all duration-500 ${isAnalyzing ? 'opacity-50 pointer-events-none' : ''}`}>
             <input
               type="file"
               accept="image/*"
@@ -3024,98 +3042,102 @@ const QuoteBuilder: React.FC<QuoteBuilderProps> = ({ client, onSave, onCancel })
               disabled={isAnalyzing}
             />
             {isAnalyzing ? (
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-                <span className="text-xs">Analisando imagem...</span>
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-12 h-12 border-4 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+                <span className="text-sm font-black text-orange-500 uppercase tracking-widest animate-pulse">Inteligência Artificial Analisando...</span>
               </div>
             ) : (
               <>
-                <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                <div className="w-20 h-20 bg-white/5 rounded-[2.5rem] flex items-center justify-center border border-white/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
                 </div>
-                Importar de Imagem 📸
+                <div className="text-center">
+                  <p className="text-white font-black text-xl uppercase tracking-tighter">Importar de Imagem 📸</p>
+                  <p className="text-slate-500 font-bold text-xs mt-1">Nossa IA reconhece as bitolas e medidas por você</p>
+                </div>
               </>
             )}
           </label>
 
           {/* Add Manual Button */}
-          <button onClick={() => setShowTypeSelector(true)} className="w-full py-10 bg-white border-4 border-dashed border-slate-100 rounded-[3rem] text-slate-400 font-black uppercase tracking-widest hover:border-amber-300 hover:text-amber-500 transition-all active:scale-[0.99] flex items-center justify-center gap-4 group">
-            <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-amber-50 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
+          <button onClick={() => setShowTypeSelector(true)} className="group relative w-full py-14 overflow-hidden rounded-[3.5rem] flex flex-col items-center justify-center gap-6 border-2 border-dashed border-white/10 hover:border-orange-500/50 bg-white/5 hover:bg-white/10 transition-all duration-500">
+            <div className="w-20 h-20 bg-white/5 rounded-[2.5rem] flex items-center justify-center border border-white/10 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
             </div>
-            Adicionar Novo Material
+            <div className="text-center">
+              <p className="text-white font-black text-xl uppercase tracking-tighter">Novo Material Manual</p>
+              <p className="text-slate-500 font-bold text-xs mt-1">Adicione vigas, sapatas ou colunas agora</p>
+            </div>
           </button>
         </div>
       </div>
 
       {showTypeSelector && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] flex items-center justify-center p-4" onClick={() => setShowTypeSelector(false)}>
-          <div className="bg-white rounded-[3rem] w-full max-w-4xl p-10 shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[300] flex items-center justify-center p-4 animate-in fade-in duration-500" onClick={() => setShowTypeSelector(false)}>
+          <div className="bg-slate-900 border border-white/10 rounded-[4rem] w-full max-w-5xl p-12 shadow-[0_40px_100px_rgba(0,0,0,0.6)] animate-in zoom-in-95 duration-300 relative overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="absolute top-0 right-0 p-8">
+              <button onClick={() => setShowTypeSelector(false)} className="w-12 h-12 glass rounded-2xl flex items-center justify-center text-slate-500 hover:text-white transition-all">✕</button>
+            </div>
+
             {!newItemBase ? (
-              <>
-                <h3 className="text-3xl font-black text-slate-900 tracking-tight mb-8 text-center">Qual o elemento?</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="relative z-10">
+                <div className="text-center mb-16">
+                  <span className="text-[10px] font-black text-orange-500 uppercase tracking-[0.4em] mb-3 block">Engenharia Ferro Fácil</span>
+                  <h3 className="text-4xl md:text-5xl font-black text-white tracking-tighter">O que vamos <br /><span className="text-slate-500">calcular agora?</span></h3>
+                </div>
+
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                   {Object.values(ElementType).map(t => (
                     <button key={t} onClick={() => {
-                      // Auto-generate ID based on type
                       const prefix = t === 'Pilar' ? 'P' : t === 'Broca' ? 'B' : t === 'Sapata' ? 'S' : 'V';
                       const count = items.filter(i => i.type === t).length + 1;
                       const autoObs = `${prefix}${count}`;
-
                       setNewItemBase({ type: t, qty: 1, lengthCm: 100, widthCm: 20, heightCm: 20, obs: autoObs })
-                    }} className="bg-slate-50 hover:bg-white border-2 border-transparent hover:border-amber-500 p-8 rounded-[2.5rem] flex flex-col items-center gap-4 transition-all group shadow-sm hover:shadow-xl">
-                      <div className="w-14 h-14 bg-slate-900 text-amber-500 rounded-2xl flex items-center justify-center font-black text-xl group-hover:scale-110 transition-transform">{t.charAt(0)}</div>
-                      <span className="font-black text-slate-700 text-xs uppercase tracking-widest text-center">{t}</span>
+                    }} className="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-orange-500/50 p-10 rounded-[3.5rem] flex flex-col items-center gap-6 transition-all group shadow-2xl hover:-translate-y-2 duration-500">
+                      <div className="w-20 h-20 premium-gradient text-white rounded-[2rem] flex items-center justify-center font-black text-3xl group-hover:scale-110 group-hover:rotate-6 transition-all shadow-lg shadow-orange-500/20">{t.charAt(0)}</div>
+                      <span className="font-black text-white text-xs uppercase tracking-[0.2em] text-center">{t}</span>
                     </button>
                   ))}
                 </div>
-              </>
+              </div>
             ) : (
-              <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
-                <div className="flex items-center gap-4 mb-4">
-                  <button onClick={() => setNewItemBase(null)} className="text-slate-400 hover:text-slate-900 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
-                  <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Cadastro da {newItemBase.type}</h3>
+              <div className="space-y-12 animate-in slide-in-from-right-8 duration-500 relative z-10">
+                <div className="flex items-center gap-6 mb-4">
+                  <button onClick={() => setNewItemBase(null)} className="w-14 h-14 glass rounded-2xl flex items-center justify-center text-slate-400 hover:text-white transition-all group">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+                  <div>
+                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-[0.3em] block mb-1">Configuração Técnica</span>
+                    <h3 className="text-3xl font-black text-white uppercase tracking-tighter">Detalhamento da {newItemBase.type}</h3>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Identificação</label>
-                    <input autoFocus type="text" value={newItemBase.obs} onChange={e => setNewItemBase({ ...newItemBase, obs: e.target.value })} placeholder="Ex: Sapata Sala, Viga Fundo..." className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 text-lg font-bold outline-none focus:border-amber-500 transition-all shadow-inner" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block ml-2">Identificação do Projeto</label>
+                    <input autoFocus type="text" value={newItemBase.obs} onChange={e => setNewItemBase({ ...newItemBase, obs: e.target.value })} placeholder="Ex: Sapata Sala, Viga Fundo..." className="w-full bg-white/5 border border-white/5 rounded-[2rem] p-6 text-xl font-bold text-white outline-none focus:border-orange-500/50 focus:bg-white/10 transition-all shadow-inner placeholder:text-slate-700" />
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Quantidade</label>
-                    <input type="number" value={newItemBase.qty} onChange={e => setNewItemBase({ ...newItemBase, qty: Number(e.target.value) })} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 text-lg font-black outline-none focus:border-amber-500 transition-all shadow-inner" />
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block ml-2">Quantidade de Elementos</label>
+                    <div className="flex items-center bg-white/5 border border-white/5 rounded-[2rem] p-2 focus-within:border-orange-500/50 transition-all">
+                      <button onClick={() => setNewItemBase({ ...newItemBase, qty: Math.max(1, newItemBase.qty - 1) })} className="w-12 h-12 flex items-center justify-center text-white hover:bg-white/5 rounded-xl transition-all font-black text-2xl">-</button>
+                      <input type="number" value={newItemBase.qty} onChange={e => setNewItemBase({ ...newItemBase, qty: Number(e.target.value) })} className="flex-grow bg-transparent text-center text-2xl font-black text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                      <button onClick={() => setNewItemBase({ ...newItemBase, qty: newItemBase.qty + 1 })} className="w-12 h-12 flex items-center justify-center text-white hover:bg-white/5 rounded-xl transition-all font-black text-2xl">+</button>
+                    </div>
                   </div>
-
-                  {/* Dimensões serão definidas no "Configurar Aço" através dos segmentos */}
-                  {/* {newItemBase.type === ElementType.SAPATA ? (
-                    <div className="col-span-full grid grid-cols-3 gap-4 p-8 bg-amber-50 rounded-[2.5rem] border border-amber-100">
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black text-amber-700 uppercase tracking-widest block">Comprimento (cm)</label>
-                        <input type="number" value={newItemBase.lengthCm} onChange={e => setNewItemBase({ ...newItemBase, lengthCm: Number(e.target.value) })} className="w-full bg-white border-2 border-amber-200 rounded-2xl p-5 text-lg font-black outline-none focus:border-amber-500 transition-all shadow-sm" />
-                      </div>
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black text-amber-700 uppercase tracking-widest block">Largura (cm)</label>
-                        <input type="number" value={newItemBase.widthCm} onChange={e => setNewItemBase({ ...newItemBase, widthCm: Number(e.target.value) })} className="w-full bg-white border-2 border-amber-200 rounded-2xl p-5 text-lg font-black outline-none focus:border-amber-500 transition-all shadow-sm" />
-                      </div>
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black text-amber-700 uppercase tracking-widest block">Altura (cm)</label>
-                        <input type="number" value={newItemBase.heightCm} onChange={e => setNewItemBase({ ...newItemBase, heightCm: Number(e.target.value) })} className="w-full bg-white border-2 border-amber-200 rounded-2xl p-5 text-lg font-black outline-none focus:border-amber-500 transition-all shadow-sm" />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Comprimento (cm)</label>
-                      <input type="number" step="1" value={newItemBase.lengthCm} onChange={e => setNewItemBase({ ...newItemBase, lengthCm: Number(e.target.value) })} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 text-lg font-black outline-none focus:border-amber-500 transition-all shadow-inner" />
-                    </div>
-                  )} */}
                 </div>
 
-                <button onClick={confirmNewItem} className="w-full bg-slate-900 text-white py-6 rounded-[2rem] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl active:scale-95">
-                  Confirmar e Ir para Aço
+                <button onClick={confirmNewItem} className="w-full premium-gradient text-white py-8 rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-xs hover:scale-[1.02] transition-all shadow-2xl shadow-orange-500/20 active:scale-95">
+                  Confirmar e Seguir para Bancada
                 </button>
               </div>
             )}
+
+            {/* Design Decorative Element */}
+            <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/10 rounded-full blur-[100px] pointer-events-none"></div>
           </div>
         </div>
       )}
@@ -3396,137 +3418,157 @@ const ItemDetailEditor: React.FC<{
   );
 
   return (
-    <div className="fixed inset-0 bg-slate-950 z-[250] flex animate-in fade-in duration-300">
+    <div className="fixed inset-0 bg-slate-950 z-[250] flex animate-in fade-in duration-500 overflow-hidden font-sans">
 
       {/* LEFT SIDE: MASSIVE VISUALIZATION (75%) */}
-      <div className="flex-grow flex flex-col bg-gradient-to-br from-slate-900 to-slate-800 relative">
+      <div className="flex-grow flex flex-col bg-slate-900 relative">
+        {/* Animated Background Gradients */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/5 rounded-full blur-[120px] animate-float"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px] animate-float" style={{ animationDelay: '-2s' }}></div>
+        </div>
 
-        {/* Top Bar */}
-        <div className="flex-none h-14 px-6 flex items-center justify-between border-b border-slate-700/50 bg-slate-900/80 backdrop-blur-sm">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center font-black text-white text-lg shadow-lg shadow-amber-500/30">
+        {/* Top Bar - Premium Glass */}
+        <div className="flex-none h-20 px-8 flex items-center justify-between border-b border-white/5 bg-slate-900/40 backdrop-blur-xl relative z-20">
+          <div className="flex items-center gap-6">
+            <div className="w-12 h-12 premium-gradient rounded-2xl flex items-center justify-center font-black text-white text-xl shadow-lg shadow-orange-500/20 rotate-3">
               {localItem.type.charAt(0)}
             </div>
             <div>
-              <h2 className="font-black text-white text-lg tracking-tight">Detalhamento Profissional</h2>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{localItem.observation || localItem.type} • Escala 1:100</p>
+              <h2 className="font-black text-white text-xl tracking-tighter">Bancada de Detalhamento</h2>
+              <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.3em]">{localItem.observation || localItem.type} • Engenharia de Precisão</p>
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="flex gap-8 items-center">
-            <div className="text-center">
-              <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Barras</p>
-              <p className="text-2xl font-black text-white leading-none">{localItem.mainBars.length}</p>
+          {/* Real-time Stats */}
+          <div className="flex gap-12 items-center">
+            <div className="text-center group">
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1 group-hover:text-orange-500 transition-colors">Componentes</p>
+              <p className="text-3xl font-black text-white tracking-tighter leading-none">{localItem.mainBars.length}</p>
             </div>
-            <div className="text-center">
-              <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Peso</p>
-              <p className="text-2xl font-black text-white leading-none">
-                {localItem.mainBars.reduce((acc, bar) => {
-                  const weightPerMeter = STEEL_WEIGHTS[bar.gauge] || 0;
-                  const baseLenM = (bar.segmentA || 0) / 100;
-                  const extraM = ((bar.segmentB || 0) + (bar.segmentC || 0) + (bar.segmentD || 0) + (bar.segmentE || 0)) / 100;
-                  return acc + (bar.count * (baseLenM + extraM) * weightPerMeter);
-                }, 0).toFixed(1)}<span className="text-sm text-slate-400 ml-1">kg</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <button onClick={onCancel} className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-700 transition-all">Cancelar</button>
-            <button onClick={handleSaveAll} className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-black uppercase tracking-wide hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-500/30 transform active:scale-95 transition-all">✓ Salvar</button>
-          </div>
-        </div>
-
-        {/* MAIN DRAWING AREA */}
-        <div className="flex-grow overflow-auto custom-scrollbar p-8 relative">
-          <div className="bg-white rounded-3xl shadow-2xl shadow-black/20 p-8 min-h-full border border-slate-200">
-            {localItem.type === 'Pilar' || localItem.type === 'Broca' ?
-              <ColumnElevationView
-                item={localItem}
-                onEditBar={(idx) => setEditingIndex(idx)}
-                onRemoveBar={handleRemoveBar}
-                onBarUpdate={(idx, offset) => {
-                  const bars = [...localItem.mainBars];
-                  if (bars[idx]) {
-                    bars[idx] = { ...bars[idx], offset };
-                    setLocalItem({ ...localItem, mainBars: bars, isConfigured: true });
-                    if (editingIndex === idx) { setNewBar(prev => ({ ...prev, offset })); }
-                  }
-                }}
-                newBar={editingIndex === undefined ? newBar : undefined}
-                onNewBarUpdate={(offset) => setNewBar(prev => ({ ...prev, offset }))}
-                selectedIdx={editingIndex}
-                readOnly={false}
-              />
-              :
-              <BeamElevationView item={localItem} newBar={editingIndex === undefined ? newBar : undefined} onNewBarUpdate={(offset) => setNewBar(prev => ({ ...prev, offset }))} onEditBar={(idx) => setEditingIndex(idx)} onRemoveBar={handleRemoveBar} selectedIdx={editingIndex} onBarUpdate={(idx, offset) => { const bars = [...localItem.mainBars]; if (bars[idx]) { bars[idx] = { ...bars[idx], offset }; setLocalItem({ ...localItem, mainBars: bars, isConfigured: true }); if (editingIndex === idx) { setNewBar(prev => ({ ...prev, offset })); } } }} readOnly={false} />
-            }
-          </div>
-        </div>
-
-        {/* Bottom Bar - Added Items as Pills */}
-        <div className="flex-none h-20 px-6 py-3 border-t border-slate-700/50 bg-slate-900/80 backdrop-blur-sm overflow-x-auto">
-          <div className="flex items-center gap-3 h-full">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest shrink-0">Itens:</span>
-            {localItem.mainBars.length === 0 && <span className="text-slate-600 text-sm font-bold">Nenhum ferro adicionado</span>}
-            {localItem.mainBars.map((bar, idx) => (
-              <div key={idx} onClick={() => setEditingIndex(idx)} className={`shrink-0 flex items-center gap-3 px-4 py-2 rounded-xl cursor-pointer transition-all ${editingIndex === idx ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}>
-                <span className="font-black text-lg">{bar.count}x</span>
-                <div>
-                  <p className="font-black text-sm leading-none">Ø{bar.gauge}mm</p>
-                  <p className="text-[9px] opacity-70 font-bold">{bar.position || `N${idx + 1}`} • {bar.placement === 'top' ? 'Sup' : 'Inf'}</p>
-                </div>
-                <button onClick={(e) => { e.stopPropagation(); handleRemoveBar(idx); }} className="ml-2 p-1 rounded hover:bg-red-500/20 text-red-400 hover:text-red-300">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
+            <div className="w-px h-10 bg-white/5"></div>
+            <div className="text-center group">
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1 group-hover:text-orange-500 transition-colors">Peso Total</p>
+              <div className="flex items-baseline gap-1.5 justify-center">
+                <p className="text-3xl font-black text-white tracking-tighter leading-none tabular-nums">
+                  {localItem.mainBars.reduce((acc, bar) => {
+                    const weightPerMeter = STEEL_WEIGHTS[bar.gauge] || 0;
+                    const baseLenM = (bar.segmentA || 0) / 100;
+                    const extraM = ((bar.segmentB || 0) + (bar.segmentC || 0) + (bar.segmentD || 0) + (bar.segmentE || 0)) / 100;
+                    return acc + (bar.count * (baseLenM + extraM) * weightPerMeter);
+                  }, 0).toFixed(1)}
+                </p>
+                <span className="text-xs font-black text-slate-500 uppercase">kg</span>
               </div>
-            ))}
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <button onClick={onCancel} className="px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/5 transition-all border border-transparent hover:border-white/10 active:scale-95">Descartar</button>
+            <button onClick={handleSaveAll} className="px-10 py-3 rounded-2xl premium-gradient text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-orange-500/20 transform active:scale-95 transition-all hover:scale-[1.02]">✓ Confirmar Ajustes</button>
+          </div>
+        </div>
+
+        {/* MAIN DRAWING AREA - Blueprint feel */}
+        <div className="flex-grow overflow-auto custom-scrollbar p-12 relative z-10 flex items-center justify-center">
+          <div className="bg-white rounded-[4rem] shadow-[0_40px_100px_rgba(0,0,0,0.4)] p-12 min-h-64 border border-slate-200/50 relative overflow-hidden">
+            {/* Blueprint grid overlay */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+
+            <div className="relative z-10">
+              {localItem.type === 'Pilar' || localItem.type === 'Broca' ?
+                <ColumnElevationView
+                  item={localItem}
+                  onEditBar={(idx) => setEditingIndex(idx)}
+                  onRemoveBar={handleRemoveBar}
+                  onBarUpdate={(idx, offset) => {
+                    const bars = [...localItem.mainBars];
+                    if (bars[idx]) {
+                      bars[idx] = { ...bars[idx], offset };
+                      setLocalItem({ ...localItem, mainBars: bars, isConfigured: true });
+                      if (editingIndex === idx) { setNewBar(prev => ({ ...prev, offset })); }
+                    }
+                  }}
+                  newBar={editingIndex === undefined ? newBar : undefined}
+                  onNewBarUpdate={(offset) => setNewBar(prev => ({ ...prev, offset }))}
+                  selectedIdx={editingIndex}
+                  readOnly={false}
+                />
+                :
+                <BeamElevationView item={localItem} newBar={editingIndex === undefined ? newBar : undefined} onNewBarUpdate={(offset) => setNewBar(prev => ({ ...prev, offset }))} onEditBar={(idx) => setEditingIndex(idx)} onRemoveBar={handleRemoveBar} selectedIdx={editingIndex} onBarUpdate={(idx, offset) => { const bars = [...localItem.mainBars]; if (bars[idx]) { bars[idx] = { ...bars[idx], offset }; setLocalItem({ ...localItem, mainBars: bars, isConfigured: true }); if (editingIndex === idx) { setNewBar(prev => ({ ...prev, offset })); } } }} readOnly={false} />
+              }
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar - Added Items with Premium Pills */}
+        <div className="flex-none h-24 px-8 py-4 border-t border-white/5 bg-slate-900/60 backdrop-blur-xl shrink-0">
+          <div className="flex items-center gap-6 h-full overflow-x-auto custom-scrollbar">
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mb-1">Armadura Atual:</span>
+              <span className="text-white font-black text-xl tracking-tighter">{localItem.mainBars.length} <small className="text-[10px] text-slate-600">Grupos</small></span>
+            </div>
+            <div className="w-px h-8 bg-white/5"></div>
+
+            <div className="flex items-center gap-4">
+              {localItem.mainBars.length === 0 && <span className="text-slate-600 text-xs font-bold italic">Nenhum vergalhão adicionado ainda...</span>}
+              {localItem.mainBars.map((bar, idx) => (
+                <div key={idx} onClick={() => setEditingIndex(idx)} className={`shrink-0 flex items-center gap-4 px-6 py-3 rounded-2xl cursor-pointer transition-all border group/pill ${editingIndex === idx ? 'bg-orange-500 text-white border-orange-400 shadow-lg shadow-orange-500/20' : 'bg-white/5 text-slate-300 border-white/5 hover:bg-white/10'}`}>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-lg ${editingIndex === idx ? 'bg-white/20' : 'bg-slate-800'}`}>{bar.count}</div>
+                  <div className="flex flex-col">
+                    <p className="font-black text-sm leading-none tabular-nums">Ø{bar.gauge}mm</p>
+                    <p className={`text-[9px] font-black uppercase tracking-widest mt-1 opacity-60`}>{bar.position || `FE-${idx + 1}`}</p>
+                  </div>
+                  <button onClick={(e) => { e.stopPropagation(); handleRemoveBar(idx); }} className={`ml-2 p-1.5 rounded-lg transition-all ${editingIndex === idx ? 'hover:bg-red-500/30 text-white' : 'hover:bg-red-500/20 text-red-400 opacity-0 group-hover/pill:opacity-100'}`}>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* RIGHT PANEL: CONTROLS (650px - WIDER) */}
-      <div className="w-[650px] shrink-0 bg-white flex flex-col border-l border-slate-200 shadow-2xl">
+      <div className="w-[650px] shrink-0 bg-slate-900 flex flex-col border-l border-white/5 shadow-2xl relative z-30">
+
+        {/* Glow effect for the panel */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-500/5 blur-[150px] pointer-events-none"></div>
 
         {/* TOP ROW: Cross Section + Stirrups SIDE BY SIDE */}
-        <div className="h-[480px] shrink-0 p-4 bg-gradient-to-br from-slate-50 to-white border-b border-slate-200 flex gap-4">
+        <div className="h-[480px] shrink-0 p-8 border-b border-white/5 flex gap-8 relative z-10">
 
           {/* LEFT: Cross Section */}
           <div className="flex-1 flex flex-col">
-            <div className="flex justify-between items-center mb-2">
-              <h4 className="text-sm font-black text-slate-700 uppercase tracking-widest">Seção Transversal</h4>
-              <span className="text-[10px] font-bold text-slate-400">Clique p/ posicionar</span>
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Corte Transversal</h4>
+              <span className="text-[9px] font-black text-orange-500/50 uppercase tracking-widest animate-pulse">Toque para Posicionar</span>
             </div>
-            <div className="flex-grow flex items-center justify-center bg-white rounded-2xl border-2 border-slate-200 overflow-hidden relative">
+            <div className="flex-grow flex items-center justify-center bg-black/20 rounded-[3rem] border border-white/5 overflow-hidden relative group/canvas backdrop-blur-sm">
               {/* Multi-position indicator */}
               {selectedPositions.length > 0 && (
-                <div className="absolute top-2 right-2 bg-indigo-500 text-white px-3 py-1 rounded-lg text-xs font-bold z-10 flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div className="absolute top-4 right-4 bg-orange-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black z-10 flex items-center gap-2 shadow-lg shadow-orange-500/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
-                  {selectedPositions.length} de {newBar.count || 0} posicionados
+                  {selectedPositions.length} / {newBar.count || 0} FIXADOS
                 </div>
               )}
-              <div className="transform scale-[1.5]">
+              <div className="transform scale-[1.6] transition-transform duration-700 group-hover/canvas:scale-[1.8]">
                 <CompositeCrossSection
                   stirrupW={localItem.stirrupWidth}
                   stirrupH={localItem.stirrupHeight}
-                  // Filter out the bar being edited so its points are "Available" and not "Occupied"
                   bars={editingIndex !== undefined ? localItem.mainBars.filter((_, i) => i !== editingIndex) : localItem.mainBars}
                   stirrupPos={localItem.stirrupPosition}
                   stirrupGauge={localItem.stirrupGauge}
                   model={localItem.stirrupModel || 'rect'}
-                  // Always show points if we have a quantity to place
                   showAvailablePoints={(newBar.count || 0) > 0}
                   selectedPointIndices={selectedPositions}
                   onPointClick={(pointIndex) => {
                     const max = newBar.count || 0;
                     if (selectedPositions.includes(pointIndex)) {
-                      // Deselect
                       setSelectedPositions(selectedPositions.filter(p => p !== pointIndex));
                     } else {
-                      // Select if under max
                       if (selectedPositions.length < max) {
                         setSelectedPositions([...selectedPositions, pointIndex]);
                       }
@@ -3538,83 +3580,72 @@ const ItemDetailEditor: React.FC<{
           </div>
 
           {/* RIGHT: Stirrups Config */}
-          <div className="w-[240px] shrink-0 flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-black text-amber-700 uppercase tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-500"></span> Estribos
+          <div className="w-[200px] shrink-0 flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] flex items-center gap-2">
+                Estribos
               </h4>
-              <input type="checkbox" checked={localItem.hasStirrups} onChange={e => setLocalItem({ ...localItem, hasStirrups: e.target.checked })} className="toggle-checkbox" />
+              <div className="relative inline-block w-10 h-6 transition duration-200 ease-in">
+                <input
+                  type="checkbox"
+                  checked={localItem.hasStirrups}
+                  onChange={e => setLocalItem({ ...localItem, hasStirrups: e.target.checked })}
+                  className="absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer mt-1 ml-1 checked:right-0 checked:bg-orange-500"
+                />
+                <label className={`block overflow-hidden h-6 rounded-full cursor-pointer transition-colors ${localItem.hasStirrups ? 'bg-orange-500/50' : 'bg-white/10'}`}></label>
+              </div>
             </div>
             {localItem.hasStirrups && (
-              <div className="flex-grow bg-amber-50 rounded-2xl border-2 border-amber-200 p-3 flex flex-col gap-2">
+              <div className="flex-grow bg-white/5 rounded-[2.5rem] border border-white/5 p-4 flex flex-col gap-4 shadow-inner">
                 <div>
-                  <label className="text-[10px] font-black text-amber-600 uppercase block mb-1">Modelo</label>
-                  <select value={localItem.stirrupModel || 'rect'} onChange={e => setLocalItem({ ...localItem, stirrupModel: e.target.value as any })} className="w-full p-2 bg-white border-2 border-amber-300 rounded-xl text-xs font-black">
-                    <option value="rect">Retangular (Padrão)</option>
-                    <option value="pentagon">Pentagonal (M2)</option>
-                    <option value="triangle">Triangular (M3)</option>
-                    <option value="circle">Circular (M4)</option>
-                    <option value="hexagon">Hexagonal (M5)</option>
+                  <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2">Modelo</label>
+                  <select value={localItem.stirrupModel || 'rect'} onChange={e => setLocalItem({ ...localItem, stirrupModel: e.target.value as any })} className="w-full p-3 bg-slate-900 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-orange-500/50">
+                    <option value="rect">Retangular</option>
+                    <option value="pentagon">Pentagonal</option>
+                    <option value="triangle">Triangular</option>
+                    <option value="circle">Circular</option>
+                    <option value="hexagon">Hexagonal</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-amber-600 uppercase block mb-1">Bitola</label>
-                  <select value={localItem.stirrupGauge} onChange={e => setLocalItem({ ...localItem, stirrupGauge: e.target.value })} className="w-full p-3 bg-white border-2 border-amber-300 rounded-xl text-lg font-black">
-                    {GAUGES.map(g => <option key={g} value={g}>Ø {g}mm</option>)}
+                  <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Bitola (Ø)</label>
+                  <select value={localItem.stirrupGauge} onChange={e => setLocalItem({ ...localItem, stirrupGauge: e.target.value })} className="w-full p-3 bg-slate-900 border border-white/10 rounded-xl text-base font-black text-white outline-none focus:border-orange-500/50">
+                    {GAUGES.map(g => <option key={g} value={g}>{g}mm</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-amber-600 uppercase block mb-1">Espaçamento</label>
-                  <input type="number" value={localItem.stirrupSpacing} onChange={e => setLocalItem({ ...localItem, stirrupSpacing: Number(e.target.value) })} placeholder="15" className="w-full p-3 bg-white border-2 border-amber-300 rounded-xl text-lg font-black text-center" />
+                  <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Passo (cm)</label>
+                  <input type="number" value={localItem.stirrupSpacing} onChange={e => setLocalItem({ ...localItem, stirrupSpacing: Number(e.target.value) })} className="w-full p-3 bg-slate-900 border border-white/10 rounded-xl text-base font-black text-white text-center outline-none focus:border-orange-500/50" />
                 </div>
-                {!isSapata && (
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className={localItem.stirrupModel === 'circle' ? "col-span-2" : ""}>
-                      <label className="text-[10px] font-black text-amber-600 uppercase block mb-1">
-                        {localItem.stirrupModel === 'circle' ? 'Diâmetro (A)'
-                          : localItem.stirrupModel === 'triangle' ? 'Base (A)'
-                            : localItem.stirrupModel === 'hexagon' ? 'Largura Total (A)'
-                              : 'Largura (A)'}
-                      </label>
-                      <input type="number" value={localItem.stirrupWidth} onChange={e => setLocalItem({ ...localItem, stirrupWidth: Number(e.target.value) })} className="w-full p-2 bg-white border-2 border-amber-300 rounded-xl text-base font-black text-center" />
-                    </div>
-                    {localItem.stirrupModel !== 'circle' && (
-                      <div>
-                        <label className="text-[10px] font-black text-amber-600 uppercase block mb-1">
-                          {localItem.stirrupModel === 'triangle' ? 'Altura (B)'
-                            : localItem.stirrupModel === 'pentagon' ? 'Altura Total (B)'
-                              : 'Altura (B)'}
-                        </label>
-                        <input type="number" value={localItem.stirrupHeight} onChange={e => setLocalItem({ ...localItem, stirrupHeight: Number(e.target.value) })} className="w-full p-2 bg-white border-2 border-amber-300 rounded-xl text-base font-black text-center" />
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             )}
             {!localItem.hasStirrups && (
-              <div className="flex-grow bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center">
-                <span className="text-slate-400 text-sm font-bold">Desativado</span>
+              <div className="flex-grow bg-white/5 rounded-[2.5rem] border border-dashed border-white/5 flex items-center justify-center">
+                <span className="text-slate-600 text-[10px] font-black uppercase tracking-widest">Inativo</span>
               </div>
             )}
           </div>
         </div>
 
         {/* FORM - NO SCROLL */}
-        <div className="flex-grow p-4 flex flex-col">
+        {/* FORM - NO SCROLL */}
+        <div className="flex-grow p-8 flex flex-col relative z-10 font-sans border-b border-white/5">
 
           {/* Header */}
-          <div className="flex justify-between items-center mb-2">
-            <h4 className={`font-black uppercase text-xs tracking-widest ${editingIndex !== undefined ? 'text-amber-600' : 'text-indigo-600'}`}>
-              {editingIndex !== undefined ? `Editando #${editingIndex + 1}` : 'Adicionar Ferro'}
-            </h4>
-            {editingIndex !== undefined && <button onClick={() => setEditingIndex(undefined)} className="text-[10px] font-bold text-red-500 hover:underline">✕ Cancelar</button>}
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-3">
+              <div className={`w-2 h-2 rounded-full animate-pulse ${editingIndex !== undefined ? 'bg-orange-500' : 'bg-blue-500'}`}></div>
+              <h4 className="font-black uppercase text-[10px] tracking-[0.3em] text-white">
+                {editingIndex !== undefined ? `REFORMULANDO GRUPO #${editingIndex + 1}` : 'VINCULAR NOVA ARMADURA'}
+              </h4>
+            </div>
+            {editingIndex !== undefined && <button onClick={() => setEditingIndex(undefined)} className="text-[10px] font-black text-orange-500 hover:text-orange-400 tracking-widest uppercase">Anular Edição</button>}
           </div>
 
-          {/* Row 1: Qtd + Bitola + Pos + Comprimento (LARGER) */}
-          <div className="grid grid-cols-5 gap-3 mb-3">
-            <div>
-              <label className="text-[10px] font-black text-slate-600 uppercase block">Qtd</label>
+          {/* Row 1: Qtd + Bitola + Pos + Comprimento */}
+          <div className="grid grid-cols-4 gap-4 mb-3">
+            <div className="col-span-1">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2 ml-1">Qtd</label>
               <input
                 type="number"
                 min="1"
@@ -3622,44 +3653,37 @@ const ItemDetailEditor: React.FC<{
                 onChange={e => {
                   const val = Number(e.target.value);
                   setNewBar({ ...newBar, count: val });
-                  // Reset positions when count changes to enforce precise selection
                   setSelectedPositions([]);
                 }}
-                placeholder="0"
-                className={`w-full p-3 border-2 rounded-xl font-black text-2xl text-center outline-none transition-all ${!newBar.count ? 'border-amber-300 bg-amber-50 focus:border-amber-500' : 'bg-slate-50 border-slate-300 focus:border-indigo-500'}`}
+                className={`w-full p-4 bg-white/5 border-2 rounded-2xl font-black text-3xl text-center text-white outline-none transition-all ${!newBar.count ? 'border-orange-500/50' : 'border-white/5 focus:border-orange-500/50'}`}
               />
             </div>
-            <div>
-              <label className="text-[10px] font-black text-slate-600 uppercase block">Bitola</label>
-              <select value={newBar.gauge} onChange={e => setNewBar({ ...newBar, gauge: e.target.value })} className="w-full p-3 bg-slate-50 border-2 border-slate-300 rounded-xl font-black text-base outline-none focus:border-indigo-500">
+            <div className="col-span-1">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2 ml-1">Bitola (Ø)</label>
+              <select value={newBar.gauge} onChange={e => setNewBar({ ...newBar, gauge: e.target.value })} className="w-full p-4 bg-white/5 border border-white/5 rounded-2xl font-black text-xl text-white outline-none focus:border-orange-500/50">
                 {GAUGES.map(g => <option key={g} value={g}>{g}mm</option>)}
               </select>
             </div>
-            <div>
-              <label className="text-[10px] font-black text-slate-600 uppercase block">Pos.</label>
-              <input type="text" value={newBar.position || ''} onChange={e => setNewBar({ ...newBar, position: e.target.value })} placeholder="N1" className="w-full p-3 bg-slate-50 border-2 border-slate-300 rounded-xl font-black text-base text-center outline-none focus:border-indigo-500" />
-            </div>
             <div className="col-span-2">
-              <label className="text-[10px] font-black text-indigo-600 uppercase block">Comp. A (cm)</label>
+              <label className="text-[9px] font-black text-orange-500 uppercase tracking-widest block mb-2 ml-1">Comp. Primário (cm)</label>
               <input
                 type="number"
                 value={newBar.segmentA || ''}
                 onChange={e => setNewBar({ ...newBar, segmentA: Number(e.target.value) })}
-                placeholder="0"
-                className={`w-full p-3 border-2 rounded-xl font-black text-2xl text-center outline-none transition-all ${!newBar.segmentA ? 'border-amber-300 bg-amber-50 text-slate-400 focus:border-amber-500' : 'bg-indigo-50 border-indigo-400 text-indigo-700 focus:border-indigo-500'}`}
+                className={`w-full p-4 border-2 rounded-2xl font-black text-3xl text-center outline-none transition-all ${!newBar.segmentA ? 'bg-orange-500/5 border-orange-500/30 text-orange-500/50' : 'bg-orange-500/10 border-orange-500/50 text-orange-500 focus:border-orange-500'}`}
               />
             </div>
           </div>
 
           {/* Quick Reuse */}
           {lastUsedSegmentA && lastUsedSegmentA !== newBar.segmentA && (
-            <button onClick={() => setNewBar({ ...newBar, segmentA: lastUsedSegmentA })} className="mb-2 w-full py-1 bg-amber-50 border border-amber-200 text-amber-700 rounded text-[10px] font-bold hover:bg-amber-100">↩ Usar último: {lastUsedSegmentA}cm</button>
+            <button onClick={() => setNewBar({ ...newBar, segmentA: lastUsedSegmentA })} className="mb-4 w-full py-2 bg-orange-500/5 border border-orange-500/10 text-orange-500/50 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] hover:bg-orange-500/10 transition-colors">↩ Sincronizar com último: {lastUsedSegmentA}cm</button>
           )}
 
-// Shapes
-          <div className="mb-2">
-            <label className="text-[8px] font-black text-slate-500 uppercase block mb-1">Formato {isVertical ? '(Vertical)' : ''}</label>
-            <div className="flex gap-1">
+          {/* Shapes Premium */}
+          <div className="mb-4">
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-3 ml-1">Arquitetura da Barra {isVertical ? '(Eixo Y)' : '(Eixo X)'}</label>
+            <div className="grid grid-cols-9 gap-1.5 p-1.5 bg-black/20 rounded-2xl border border-white/5">
               {[
                 { s: 'straight', svg: 'M2,12 L22,12', svgVert: 'M12,22 L12,2' },
                 { s: 'l_left_up', svg: 'M4,4 L4,12 L20,12', svgVert: 'M18,22 L12,22 L12,2' },
@@ -3671,202 +3695,101 @@ const ItemDetailEditor: React.FC<{
                 { s: 'u_down', svg: 'M4,20 L4,8 L28,8 L28,20', w: 32, svgVert: 'M6,22 L12,22 L12,2 L6,2' },
                 { s: 'c_down', svg: 'M8,16 L4,16 L4,8 L28,8 L28,16 L24,16', w: 32, svgVert: 'M6,18 L6,22 L12,22 L12,2 L6,2 L6,6' }
               ].map(sh => (
-                <button key={sh.s} onClick={() => { const hS = newBar.hookStart || 20; const hE = newBar.hookEnd || 20; const isC = sh.s.startsWith('c_'); setNewBar({ ...newBar, hookStartType: sh.s.includes('left') || sh.s.includes('u_') || isC ? (sh.s.includes('down') ? 'down' : 'up') : 'none', hookEndType: sh.s.includes('right') || sh.s.includes('u_') || isC ? (sh.s.includes('down') ? 'down' : 'up') : 'none', hookStart: sh.s.includes('left') || sh.s.includes('u_') || isC ? hS : 0, hookEnd: sh.s.includes('right') || sh.s.includes('u_') || isC ? hE : 0, shape: sh.s, segmentB: sh.s.includes('left') || sh.s.includes('u_') || isC ? hS : 0, segmentC: sh.s.includes('right') || sh.s.includes('u_') || isC ? hE : 0, segmentD: isC ? (newBar.segmentD || 10) : 0, segmentE: isC ? (newBar.segmentE || 10) : 0 }); setVisualShape(sh.s); }} className={`flex-1 h-9 rounded-lg border flex items-center justify-center transition-all ${visualShape === sh.s ? 'border-indigo-600 bg-indigo-100 text-indigo-600' : 'border-slate-200 text-slate-400 hover:border-indigo-300'}`}>
-                  <svg width={sh.w ? 16 : 14} height="14" viewBox={`0 0 ${sh.w || 24} 24`} className="stroke-current stroke-2 fill-none"><path d={isVertical ? (sh.svgVert || sh.svg) : sh.svg} /></svg>
+                <button key={sh.s} onClick={() => { const hS = newBar.hookStart || 20; const hE = newBar.hookEnd || 20; const isC = sh.s.startsWith('c_'); setNewBar({ ...newBar, hookStartType: sh.s.includes('left') || sh.s.includes('u_') || isC ? (sh.s.includes('down') ? 'down' : 'up') : 'none', hookEndType: sh.s.includes('right') || sh.s.includes('u_') || isC ? (sh.s.includes('down') ? 'down' : 'up') : 'none', hookStart: sh.s.includes('left') || sh.s.includes('u_') || isC ? hS : 0, hookEnd: sh.s.includes('right') || sh.s.includes('u_') || isC ? hE : 0, shape: sh.s, segmentB: sh.s.includes('left') || sh.s.includes('u_') || isC ? hS : 0, segmentC: sh.s.includes('right') || sh.s.includes('u_') || isC ? hE : 0, segmentD: isC ? (newBar.segmentD || 10) : 0, segmentE: isC ? (newBar.segmentE || 10) : 0 }); setVisualShape(sh.s); }} className={`aspect-square rounded-xl border flex items-center justify-center transition-all ${visualShape === sh.s ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'border-transparent text-slate-500 hover:bg-white/5 hover:text-white'}`}>
+                  <svg width={sh.w ? 16 : 14} height="14" viewBox={`0 0 ${sh.w || 24} 24`} className="stroke-current stroke-[3] fill-none"><path d={isVertical ? (sh.svgVert || sh.svg) : sh.svg} /></svg>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Segments B/C/D/E in one row */}
+          {/* Segments B/C/D/E */}
           {(['l_left_up', 'l_left_down', 'u_up', 'u_down', 'c_up', 'c_down', 'l_right_up', 'l_right_down'].includes(visualShape)) && (
-            <div className="grid grid-cols-4 gap-2 mb-2">
+            <div className="grid grid-cols-4 gap-3 mb-4">
               {['l_left_up', 'l_left_down', 'u_up', 'u_down', 'c_up', 'c_down'].includes(visualShape) && (
-                <div><label className="text-[8px] font-black text-slate-500 uppercase block">B (cm)</label><input type="number" value={newBar.segmentB || newBar.hookStart || ''} onChange={e => { const val = Number(e.target.value); setNewBar({ ...newBar, segmentB: val, hookStart: val }); }} placeholder="20" className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-black text-sm text-center outline-none focus:border-indigo-500" /></div>
+                <div><label className="text-[9px] font-black text-slate-500 uppercase block mb-2 ml-1">Lado B (cm)</label><input type="number" value={newBar.segmentB || newBar.hookStart || ''} onChange={e => { const val = Number(e.target.value); setNewBar({ ...newBar, segmentB: val, hookStart: val }); }} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl font-black text-sm text-center text-white outline-none focus:border-orange-500/50" /></div>
               )}
               {['u_up', 'u_down', 'c_up', 'c_down', 'l_right_up', 'l_right_down'].includes(visualShape) && (
-                <div><label className="text-[8px] font-black text-slate-500 uppercase block">C (cm)</label><input type="number" value={newBar.segmentC || newBar.hookEnd || ''} onChange={e => { const val = Number(e.target.value); setNewBar({ ...newBar, segmentC: val, hookEnd: val }); }} placeholder="20" className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-black text-sm text-center outline-none focus:border-indigo-500" /></div>
+                <div><label className="text-[9px] font-black text-slate-500 uppercase block mb-2 ml-1">Lado C (cm)</label><input type="number" value={newBar.segmentC || newBar.hookEnd || ''} onChange={e => { const val = Number(e.target.value); setNewBar({ ...newBar, segmentC: val, hookEnd: val }); }} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl font-black text-sm text-center text-white outline-none focus:border-orange-500/50" /></div>
               )}
               {['c_up', 'c_down'].includes(visualShape) && (
                 <>
-                  <div><label className="text-[8px] font-black text-slate-500 uppercase block">D (cm)</label><input type="number" value={newBar.segmentD || ''} onChange={e => setNewBar({ ...newBar, segmentD: Number(e.target.value) })} placeholder="10" className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-black text-sm text-center outline-none focus:border-indigo-500" /></div>
-                  <div><label className="text-[8px] font-black text-slate-500 uppercase block">E (cm)</label><input type="number" value={newBar.segmentE || ''} onChange={e => setNewBar({ ...newBar, segmentE: Number(e.target.value) })} placeholder="10" className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-black text-sm text-center outline-none focus:border-indigo-500" /></div>
+                  <div><label className="text-[9px] font-black text-slate-500 uppercase block mb-2 ml-1">Virada D</label><input type="number" value={newBar.segmentD || ''} onChange={e => setNewBar({ ...newBar, segmentD: Number(e.target.value) })} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl font-black text-sm text-center text-white outline-none focus:border-orange-500/50" /></div>
+                  <div><label className="text-[9px] font-black text-slate-500 uppercase block mb-2 ml-1">Virada E</label><input type="number" value={newBar.segmentE || ''} onChange={e => setNewBar({ ...newBar, segmentE: Number(e.target.value) })} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl font-black text-sm text-center text-white outline-none focus:border-orange-500/50" /></div>
                 </>
               )}
             </div>
           )}
 
-          {/* Preview + Add Button */}
+          {/* Finalize Button */}
           <div className="mt-auto">
-            <div className="p-2 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between mb-3">
-              <div className="flex gap-1">
-                <span className="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[9px] font-black">{newBar.count}x Ø{newBar.gauge}</span>
-                {newBar.segmentA && <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[9px] font-black">{((newBar.segmentA || 0) + (newBar.segmentB || 0) + (newBar.segmentC || 0))}cm</span>}
-              </div>
-              <div className={`flex items-center justify-center ${isVertical ? 'w-[40px] h-[100px]' : 'w-[100px] h-[40px]'}`}>
-                <div className={`transform scale-75 transition-transform ${isVertical ? '-rotate-90' : ''}`}>
-                  <BarDrawing compact length={(newBar.segmentA || 0) / 100} hookStart={newBar.segmentB || newBar.hookStart || 0} hookEnd={newBar.segmentC || newBar.hookEnd || 0} startType={newBar.hookStartType} endType={newBar.hookEndType} shape={visualShape} segmentD={newBar.segmentD} segmentE={newBar.segmentE} />
-                </div>
-              </div>
-            </div>
-
             <button
+              disabled={!newBar.count || !newBar.segmentA || (editingIndex === undefined && selectedPositions.length !== (newBar.count || 0))}
               onClick={handleAddOrUpdateBar}
-              disabled={(!newBar.segmentA || newBar.segmentA <= 0) || (!newBar.count || newBar.count <= 0) || (editingIndex === undefined && selectedPositions.length !== (newBar.count || 0))}
-              className={`w-full py-3 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 ${(!newBar.segmentA || newBar.segmentA <= 0 || !newBar.count || newBar.count <= 0 || (editingIndex === undefined && selectedPositions.length !== (newBar.count || 0))) ? 'bg-slate-300 cursor-not-allowed opacity-70 text-slate-500' : (editingIndex !== undefined ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' : 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white')}`}
+              className="w-full premium-gradient text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs shadow-2xl shadow-orange-500/30 active:scale-95 disabled:opacity-20 flex items-center justify-center gap-3 relative z-10"
             >
-              {editingIndex !== undefined ? '✓ Atualizar' : (
-                (!newBar.count || newBar.count <= 0) ? 'Defina Qtd > 0' :
-                  (selectedPositions.length !== (newBar.count || 0) ? `Selecione Pontos (${selectedPositions.length}/${newBar.count})` : '+ Adicionar Ferro')
-              )}
+              {(editingIndex === undefined && selectedPositions.length !== (newBar.count || 0))
+                ? `FALTAM ${(newBar.count || 1) - selectedPositions.length} POSIÇÕES NA SEÇÃO`
+                : editingIndex !== undefined ? 'ATUALIZAR COMPONENTE' : 'VINCULAR AO PROJETO'}
             </button>
           </div>
-
         </div>
 
         {/* APOIOS (Supports) Section */}
-        <div className="p-4 border-t border-slate-200 bg-gradient-to-b from-blue-50 to-white max-h-64 overflow-y-auto">
-          <h4 className="font-black uppercase text-xs tracking-widest text-blue-600 mb-3">
-            {isVertical ? 'Esperas e Vãos (Estribos)' : 'Vãos e Apoios'}
-          </h4>
+        <div className="p-8 bg-black/20 flex flex-col max-h-64 overflow-y-auto relative">
+          <div className="flex justify-between items-center mb-6">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+              {isVertical ? 'Vãos Estreitos / Esperas' : 'Vãos e Pontos de Apoio'}
+            </h4>
+            {!isVertical && (
+              <button
+                onClick={() => {
+                  const newSupport = { position: localItem.length * 50, width: 20, leftGap: 20, rightGap: 20, label: `P${(localItem.supports?.length || 0) + 1}` };
+                  setLocalItem({ ...localItem, supports: [...(localItem.supports || []), newSupport] });
+                }}
+                className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+              >
+                + Novo Apoio
+              </button>
+            )}
+          </div>
 
           {/* Beam Extremity Gaps */}
-          <div className="grid grid-cols-2 gap-2 mb-3 p-2 bg-white rounded-lg border border-blue-200">
-            <div>
-              <label className="text-[8px] text-blue-600 font-bold block">
-                {isVertical ? 'Vão Inferior (cm)' : 'Vão Início (cm)'}
-              </label>
-              <input
-                type="number"
-                value={localItem.startGap || ''}
-                onChange={e => setLocalItem({ ...localItem, startGap: Number(e.target.value) })}
-                placeholder="40"
-                className="w-full p-1 text-xs font-bold text-center border border-blue-300 rounded"
-              />
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">{isVertical ? 'Vão Inferior (cm)' : 'Vão de Início (cm)'}</label>
+              <input type="number" value={localItem.startGap || ''} onChange={e => setLocalItem({ ...localItem, startGap: Number(e.target.value) })} className="w-full p-4 bg-white/5 border border-white/5 rounded-2xl font-black text-xl text-white text-center outline-none focus:border-orange-500/50" />
             </div>
-            <div>
-              <label className="text-[8px] text-blue-600 font-bold block">
-                {isVertical ? 'Vão Superior (cm)' : 'Vão Final (cm)'}
-              </label>
-              <input
-                type="number"
-                value={localItem.endGap || ''}
-                onChange={e => setLocalItem({ ...localItem, endGap: Number(e.target.value) })}
-                placeholder="20"
-                className="w-full p-1 text-xs font-bold text-center border border-blue-300 rounded"
-              />
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">{isVertical ? 'Vão Superior (cm)' : 'Vão de Saída (cm)'}</label>
+              <input type="number" value={localItem.endGap || ''} onChange={e => setLocalItem({ ...localItem, endGap: Number(e.target.value) })} className="w-full p-4 bg-white/5 border border-white/5 rounded-2xl font-black text-xl text-white text-center outline-none focus:border-orange-500/50" />
             </div>
           </div>
 
-          {/* Support List Header - Only for Non-Vertical (Beams) */}
-          {!isVertical && (
-            <>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-[9px] font-bold text-pink-600 uppercase">Apoios Intermediários</span>
-                <button
-                  onClick={() => {
-                    const newSupport = { position: localItem.length * 50, width: 20, leftGap: 20, rightGap: 20, label: `P${(localItem.supports?.length || 0) + 1}` };
-                    setLocalItem({ ...localItem, supports: [...(localItem.supports || []), newSupport] });
-                  }}
-                  className="px-2 py-0.5 rounded bg-pink-500 text-white text-[9px] font-bold hover:bg-pink-600"
-                >
-                  + Apoio
-                </button>
-              </div>
-
-              {(!localItem.supports || localItem.supports.length === 0) ? (
-                <p className="text-[10px] text-slate-400 text-center py-2 bg-slate-50 rounded border border-dashed border-slate-200">Nenhum apoio intermediário</p>
-              ) : (
-                <div className="space-y-2">
-                  {localItem.supports.map((support, idx) => (
-                    <div key={idx} className="bg-white p-2 rounded-lg border border-pink-200">
-                      <div className="flex items-center gap-2 mb-2">
-                        <input
-                          type="text"
-                          value={support.label || ''}
-                          onChange={e => {
-                            const supports = [...(localItem.supports || [])];
-                            supports[idx] = { ...supports[idx], label: e.target.value };
-                            setLocalItem({ ...localItem, supports });
-                          }}
-                          placeholder="P1"
-                          className="w-14 p-1 text-xs font-bold text-center border border-pink-300 rounded bg-pink-50"
-                        />
-                        <div className="flex-1">
-                          <label className="text-[7px] text-pink-600 font-bold">Posição (cm)</label>
-                          <input
-                            type="number"
-                            value={support.position}
-                            onChange={e => {
-                              const supports = [...(localItem.supports || [])];
-                              supports[idx] = { ...supports[idx], position: Number(e.target.value) };
-                              setLocalItem({ ...localItem, supports });
-                            }}
-                            className="w-full p-1 text-xs font-bold text-center border border-pink-300 rounded"
-                          />
-                        </div>
-                        <button
-                          onClick={() => {
-                            const supports = (localItem.supports || []).filter((_, i) => i !== idx);
-                            setLocalItem({ ...localItem, supports });
-                          }}
-                          className="p-1 text-red-500 hover:bg-red-50 rounded"
-                        >
-                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
-                      </div>
-                      {/* Gap fields */}
-                      <div className="grid grid-cols-3 gap-1">
-                        <div>
-                          <label className="text-[7px] text-blue-600 font-bold">Vão ← (cm)</label>
-                          <input
-                            type="number"
-                            value={support.leftGap || ''}
-                            onChange={e => {
-                              const supports = [...(localItem.supports || [])];
-                              supports[idx] = { ...supports[idx], leftGap: Number(e.target.value) };
-                              setLocalItem({ ...localItem, supports });
-                            }}
-                            placeholder="20"
-                            className="w-full p-1 text-xs font-bold text-center border border-blue-300 rounded"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[7px] text-gray-500 font-bold">Largura (cm)</label>
-                          <input
-                            type="number"
-                            value={support.width}
-                            onChange={e => {
-                              const supports = [...(localItem.supports || [])];
-                              supports[idx] = { ...supports[idx], width: Number(e.target.value) };
-                              setLocalItem({ ...localItem, supports });
-                            }}
-                            className="w-full p-1 text-xs font-bold text-center border border-gray-300 rounded bg-gray-50"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[7px] text-blue-600 font-bold">Vão → (cm)</label>
-                          <input
-                            type="number"
-                            value={support.rightGap || ''}
-                            onChange={e => {
-                              const supports = [...(localItem.supports || [])];
-                              supports[idx] = { ...supports[idx], rightGap: Number(e.target.value) };
-                              setLocalItem({ ...localItem, supports });
-                            }}
-                            placeholder="20"
-                            className="w-full p-1 text-xs font-bold text-center border border-blue-300 rounded"
-                          />
-                        </div>
-                      </div>
+          {!isVertical && localItem.supports && localItem.supports.length > 0 && (
+            <div className="space-y-3">
+              {localItem.supports.map((sup, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5 group">
+                  <input type="text" value={sup.label} onChange={e => { const s = [...localItem.supports!]; s[idx].label = e.target.value; setLocalItem({ ...localItem, supports: s }); }} className="w-16 bg-transparent border-b border-white/10 text-[10px] font-black text-white outline-none focus:border-orange-500" />
+                  <div className="flex-grow grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="text-[7px] font-black text-slate-600 block uppercase">Pos (cm)</label>
+                      <input type="number" value={sup.position} onChange={e => { const s = [...localItem.supports!]; s[idx].position = Number(e.target.value); setLocalItem({ ...localItem, supports: s }); }} className="w-full bg-transparent text-[10px] font-black text-white" />
                     </div>
-                  ))}
+                    <div>
+                      <label className="text-[7px] font-black text-slate-600 block uppercase">Larg (cm)</label>
+                      <input type="number" value={sup.width} onChange={e => { const s = [...localItem.supports!]; s[idx].width = Number(e.target.value); setLocalItem({ ...localItem, supports: s }); }} className="w-full bg-transparent text-[10px] font-black text-white" />
+                    </div>
+                    <div>
+                      <label className="text-[7px] font-black text-slate-600 block uppercase">Vão Esquerdo</label>
+                      <input type="number" value={sup.leftGap} onChange={e => { const s = [...localItem.supports!]; s[idx].leftGap = Number(e.target.value); s[idx].rightGap = Number(e.target.value); setLocalItem({ ...localItem, supports: s }); }} className="w-full bg-transparent text-[10px] font-black text-white" />
+                    </div>
+                  </div>
+                  <button onClick={() => setLocalItem({ ...localItem, supports: localItem.supports!.filter((_, i) => i !== idx) })} className="p-2 rounded-xl text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
                 </div>
-              )}
-            </>
+              ))}
+            </div>
           )}
         </div>
-
       </div>
     </div>
   );
