@@ -59,6 +59,28 @@ export const ProjectSelection: React.FC<ProjectSelectionProps> = ({ onSelect }) 
                         </div>
                         <div className="absolute top-6 right-8 text-[100px] font-black text-white/5 select-none pointer-events-none">02</div>
                     </button>
+
+                    {/* FERRO FÁCIL */}
+                    <button
+                        onClick={() => (onSelect as any)('FERRO')}
+                        className="group relative bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[2.5rem] text-left hover:bg-white/10 transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 md:col-span-2"
+                    >
+                        <div className="w-16 h-16 bg-orange-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-500">
+                            <LayoutDashboard className="text-orange-500 w-8 h-8" />
+                        </div>
+                        <div className="flex items-center justify-between gap-4">
+                            <div>
+                                <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Ferro Fácil</h2>
+                                <p className="text-slate-400 font-medium leading-relaxed mb-8">
+                                    Cálculo técnico de ferragens, orçamentos rápidos e gestão de produção de aço.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 text-orange-500 font-black uppercase text-sm tracking-widest whitespace-nowrap">
+                                ENTRAR <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                            </div>
+                        </div>
+                        <div className="absolute top-6 right-8 text-[100px] font-black text-white/5 select-none pointer-events-none">03</div>
+                    </button>
                 </div>
 
                 <div className="mt-16 text-center">

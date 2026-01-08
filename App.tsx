@@ -4,12 +4,13 @@ import { Login } from './Login';
 import { ProjectSelection } from './ProjectSelection';
 import { GestaoInteligente } from './GestaoInteligente';
 import { MarineHomeClear } from './MarineHomeClear';
+import { FerroFacil } from './FerroFacil';
 
 const App: React.FC = () => {
   const [loggedUser, setLoggedUser] = useState<string | null>(() => localStorage.getItem('mm_user'));
-  const [currentProject, setCurrentProject] = useState<'GESTO' | 'MARINE' | null>(() => {
+  const [currentProject, setCurrentProject] = useState<'GESTO' | 'MARINE' | 'FERRO' | null>(() => {
     const saved = localStorage.getItem('mm_project');
-    return (saved === 'GESTO' || saved === 'MARINE') ? saved : null;
+    return (saved === 'GESTO' || saved === 'MARINE' || saved === 'FERRO') ? (saved as any) : null;
   });
 
   const handleLogin = (user: string) => {
@@ -21,7 +22,7 @@ const App: React.FC = () => {
     }
   };
 
-  const handleSelectProject = (project: 'GESTO' | 'MARINE' | null) => {
+  const handleSelectProject = (project: 'GESTO' | 'MARINE' | 'FERRO' | null) => {
     setCurrentProject(project);
     if (project) localStorage.setItem('mm_project', project);
     else localStorage.removeItem('mm_project');
@@ -48,6 +49,10 @@ const App: React.FC = () => {
 
   if (currentProject === 'MARINE') {
     return <MarineHomeClear onBack={loggedUser === 'mariane' ? handleLogout : () => handleSelectProject(null)} />;
+  }
+
+  if (currentProject === 'FERRO') {
+    return <FerroFacil onBack={() => handleSelectProject(null)} />;
   }
 
   return null;
