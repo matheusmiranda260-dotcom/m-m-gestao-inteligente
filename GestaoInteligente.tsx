@@ -448,6 +448,7 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
                                             <div className="text-[10px] md:text-sm font-bold">{income.source}: {income.description || 'Receita'}</div>
                                             <div className="flex items-center gap-2">
                                                 <span className="font-black">R$ {income.amount.toFixed(2)}</span>
+                                                <button onClick={() => handleEditTransaction(income, TransactionType.INCOME)} className="text-blue-400 hover:text-blue-600"><Edit2 size={14} /></button>
                                                 <button onClick={() => deleteTransaction('income', income.id)} className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
                                             </div>
                                         </div>
@@ -464,6 +465,7 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <span className="font-black">R$ {expense.amount.toFixed(2)}</span>
+                                                <button onClick={() => handleEditTransaction(expense, TransactionType.FIXED_EXPENSE)} className="text-blue-400 hover:text-blue-600"><Edit2 size={14} /></button>
                                                 <button onClick={() => deleteTransaction('fixed', expense.id)} className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
                                             </div>
                                         </div>
@@ -480,6 +482,7 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <span className="font-black">R$ {card.installmentValue.toFixed(2)}</span>
+                                                <button onClick={() => handleEditTransaction(card, TransactionType.CARD_EXPENSE)} className="text-blue-400 hover:text-blue-600"><Edit2 size={14} /></button>
                                                 <button onClick={() => deleteTransaction('card', card.id)} className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
                                             </div>
                                         </div>
@@ -496,47 +499,76 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
                 <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center p-0 md:p-4">
                     <div className="bg-white rounded-t-3xl md:rounded-[3rem] w-full max-w-2xl p-5 md:p-12 relative shadow-2xl border-t-8 border-emerald-500">
                         <button onClick={() => setShowModal(null)} className="absolute top-6 right-6 text-slate-300"><X size={32} /></button>
-                        <h3 className="text-xl md:text-3xl font-black mb-8 flex items-center gap-3">Novo Lançamento</h3>
+                        <h3 className="text-xl md:text-3xl font-black mb-8 flex items-center gap-3">{editingTransaction ? 'Editar Lançamento' : 'Novo Lançamento'}</h3>
                         <form onSubmit={async (e) => {
                             e.preventDefault();
+                            setIsLoading(true);
                             const formDataObj = new FormData(e.currentTarget);
                             const val = parseFloat((formDataObj.get('amount') as string).replace(',', '.'));
-                            const finalMonths = selectedMonths.length > 0 ? selectedMonths : [currentDate.getMonth()];
+                            const desc = formDataObj.get('description') as string;
 
-                            if (showModal === TransactionType.CARD_EXPENSE) {
-                                handleSmartAddCard({
-                                    description: formDataObj.get('description') as string, amount: val,
-                                    provider: formDataObj.get('provider') as CardProvider,
-                                    totalInstallments: parseInt(formDataObj.get('totalInstallments') as string) || 1,
-                                    remainingInstallments: parseInt(formDataObj.get('totalInstallments') as string) || 1,
-                                    purchaseDate: new Date().toISOString()
-                                }, finalMonths, transactionYear);
-                            } else if (showModal === TransactionType.INCOME) {
-                                handleAddIncome({ description: formDataObj.get('description') as string, amount: val, source: formDataObj.get('source') as IncomeSource, date: new Date().toISOString() }, finalMonths, transactionYear);
-                            } else if (showModal === TransactionType.FIXED_EXPENSE) {
-                                const category = formDataObj.get('category') as FixedExpenseCategory;
-                                handleAddFixedExpense({ category, name: category === FixedExpenseCategory.OUTROS ? formDataObj.get('customName') as string : category, amount: val, dueDate: formDataObj.get('dueDate') as string }, finalMonths, transactionYear);
+                            if (editingTransaction) {
+                                if (showModal === TransactionType.CARD_EXPENSE) {
+                                    await api.updateCardTransaction(editingTransaction.id, {
+                                        description: desc,
+                                        amount: val,
+                                        provider: formDataObj.get('provider') as CardProvider,
+                                        totalInstallments: parseInt(formDataObj.get('totalInstallments') as string)
+                                    });
+                                } else if (showModal === TransactionType.INCOME) {
+                                    await api.updateIncome(editingTransaction.id, {
+                                        description: desc,
+                                        amount: val,
+                                        source: formDataObj.get('source') as IncomeSource
+                                    });
+                                } else if (showModal === TransactionType.FIXED_EXPENSE) {
+                                    const cat = formDataObj.get('category') as FixedExpenseCategory;
+                                    await api.updateFixedExpense(editingTransaction.id, {
+                                        name: cat === FixedExpenseCategory.OUTROS ? formDataObj.get('customName') as string : cat,
+                                        amount: val,
+                                        category: cat,
+                                        dueDate: formDataObj.get('dueDate') as string
+                                    });
+                                }
+                                await fetchSafely();
+                                setShowModal(null);
+                            } else {
+                                const finalMonths = selectedMonths.length > 0 ? selectedMonths : [currentDate.getMonth()];
+                                if (showModal === TransactionType.CARD_EXPENSE) {
+                                    handleSmartAddCard({
+                                        description: desc, amount: val,
+                                        provider: formDataObj.get('provider') as CardProvider,
+                                        totalInstallments: parseInt(formDataObj.get('totalInstallments') as string) || 1,
+                                        remainingInstallments: parseInt(formDataObj.get('totalInstallments') as string) || 1,
+                                        purchaseDate: new Date().toISOString()
+                                    }, finalMonths, transactionYear);
+                                } else if (showModal === TransactionType.INCOME) {
+                                    handleAddIncome({ description: desc, amount: val, source: formDataObj.get('source') as IncomeSource, date: new Date().toISOString() }, finalMonths, transactionYear);
+                                } else if (showModal === TransactionType.FIXED_EXPENSE) {
+                                    const category = formDataObj.get('category') as FixedExpenseCategory;
+                                    handleAddFixedExpense({ category, name: category === FixedExpenseCategory.OUTROS ? formDataObj.get('customName') as string : category, amount: val, dueDate: formDataObj.get('dueDate') as string }, finalMonths, transactionYear);
+                                }
                             }
                         }} className="space-y-6">
-                            <input name="description" placeholder="Descrição" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold" />
+                            <input name="description" defaultValue={editingTransaction?.description || editingTransaction?.name || ''} placeholder="Descrição" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold" />
                             <div className="grid grid-cols-2 gap-4">
-                                <input name="amount" type="number" step="0.01" placeholder="Valor R$ 0,00" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-black" />
+                                <input name="amount" defaultValue={editingTransaction?.amount || ''} type="number" step="0.01" placeholder="Valor R$ 0,00" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-black" />
                                 {showModal === TransactionType.CARD_EXPENSE && (
                                     <>
                                         <div className="col-span-2 md:col-span-1">
-                                            <select name="provider" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold" defaultValue="">
+                                            <select name="provider" defaultValue={editingTransaction?.provider || ''} required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold">
                                                 <option value="" disabled>Selecione o Cartão</option>
                                                 {Object.values(CardProvider).map(p => (
                                                     <option key={p} value={p}>{p}</option>
                                                 ))}
                                             </select>
                                         </div>
-                                        <input name="totalInstallments" type="number" placeholder="Parcelas" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-black" />
+                                        <input name="totalInstallments" defaultValue={editingTransaction?.totalInstallments || ''} type="number" placeholder="Parcelas" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-black" />
                                     </>
                                 )}
                                 {showModal === TransactionType.INCOME && (
                                     <div className="col-span-2">
-                                        <select name="source" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold" defaultValue="">
+                                        <select name="source" defaultValue={editingTransaction?.source || ''} required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold">
                                             <option value="" disabled>Fonte da Renda</option>
                                             {Object.values(IncomeSource).map(s => (
                                                 <option key={s} value={s}>{s}</option>
@@ -552,7 +584,7 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
                                                 required
                                                 className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold"
                                                 onChange={(e) => setFixedCategory(e.target.value as FixedExpenseCategory)}
-                                                defaultValue=""
+                                                defaultValue={editingTransaction?.category || ''}
                                             >
                                                 <option value="" disabled>Categoria</option>
                                                 {Object.values(FixedExpenseCategory).map(c => (
@@ -560,10 +592,10 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
                                                 ))}
                                             </select>
                                         </div>
-                                        <input name="dueDate" type="number" min="1" max="31" placeholder="Dia Venc." required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-black" />
+                                        <input name="dueDate" defaultValue={editingTransaction?.dueDate || ''} type="number" min="1" max="31" placeholder="Dia Venc." required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-black" />
                                         {fixedCategory === FixedExpenseCategory.OUTROS && (
                                             <div className="col-span-2">
-                                                <input name="customName" placeholder="Nome da Despesa" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold" />
+                                                <input name="customName" defaultValue={editingTransaction?.name || ''} placeholder="Nome da Despesa" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold" />
                                             </div>
                                         )}
                                     </>
