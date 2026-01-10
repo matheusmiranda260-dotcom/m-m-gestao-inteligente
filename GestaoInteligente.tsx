@@ -518,10 +518,56 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
                                 handleAddFixedExpense({ category, name: category === FixedExpenseCategory.OUTROS ? formDataObj.get('customName') as string : category, amount: val, dueDate: formDataObj.get('dueDate') as string }, finalMonths, transactionYear);
                             }
                         }} className="space-y-6">
-                            <input name="description" placeholder="Descrição" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold" />
+                            <input name="description" placeholder="Descrição" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold" />
                             <div className="grid grid-cols-2 gap-4">
-                                <input name="amount" type="number" step="0.01" placeholder="Valor R$ 0,00" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-black" />
-                                {showModal === TransactionType.CARD_EXPENSE && <input name="totalInstallments" type="number" placeholder="Parcelas" className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-black" />}
+                                <input name="amount" type="number" step="0.01" placeholder="Valor R$ 0,00" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-black" />
+                                {showModal === TransactionType.CARD_EXPENSE && (
+                                    <>
+                                        <div className="col-span-2 md:col-span-1">
+                                            <select name="provider" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold" defaultValue="">
+                                                <option value="" disabled>Selecione o Cartão</option>
+                                                {Object.values(CardProvider).map(p => (
+                                                    <option key={p} value={p}>{p}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <input name="totalInstallments" type="number" placeholder="Parcelas" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-black" />
+                                    </>
+                                )}
+                                {showModal === TransactionType.INCOME && (
+                                    <div className="col-span-2">
+                                        <select name="source" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold" defaultValue="">
+                                            <option value="" disabled>Fonte da Renda</option>
+                                            {Object.values(IncomeSource).map(s => (
+                                                <option key={s} value={s}>{s}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                                {showModal === TransactionType.FIXED_EXPENSE && (
+                                    <>
+                                        <div className="col-span-2 md:col-span-1">
+                                            <select
+                                                name="category"
+                                                required
+                                                className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold"
+                                                onChange={(e) => setFixedCategory(e.target.value as FixedExpenseCategory)}
+                                                defaultValue=""
+                                            >
+                                                <option value="" disabled>Categoria</option>
+                                                {Object.values(FixedExpenseCategory).map(c => (
+                                                    <option key={c} value={c}>{c}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <input name="dueDate" type="number" min="1" max="31" placeholder="Dia Venc." required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-black" />
+                                        {fixedCategory === FixedExpenseCategory.OUTROS && (
+                                            <div className="col-span-2">
+                                                <input name="customName" placeholder="Nome da Despesa" required className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-emerald-500 outline-none font-bold" />
+                                            </div>
+                                        )}
+                                    </>
+                                )}
                             </div>
                             <button type="submit" className="w-full py-4 bg-slate-900 text-white font-black rounded-xl hover:bg-emerald-600 transition-all uppercase tracking-widest">Confirmar</button>
                         </form>
