@@ -189,6 +189,8 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
             setShowModal(null);
         } catch (error) {
             console.error("Erro ao adicionar transação:", error);
+            alert("Erro ao salvar transação. Verifique os dados e tente novamente.");
+            setIsLoading(false);
         }
     };
 
@@ -213,19 +215,31 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
     const handleAddIncome = async (base: Omit<Income, 'id'>, targetMonths: number[], yearOverride?: number) => {
         const year = yearOverride || currentDate.getFullYear();
         setIsLoading(true);
-        const promises = targetMonths.map(m => api.addIncome({ ...base, date: new Date(year, m, 1).toISOString() }));
-        await Promise.all(promises);
-        await fetchSafely();
-        setShowModal(null);
+        try {
+            const promises = targetMonths.map(m => api.addIncome({ ...base, date: new Date(year, m, 1).toISOString() }));
+            await Promise.all(promises);
+            await fetchSafely();
+            setShowModal(null);
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao salvar entrada.");
+            setIsLoading(false);
+        }
     };
 
     const handleAddFixedExpense = async (base: Omit<FixedExpense, 'id' | 'isPaid' | 'month' | 'year'>, targetMonths: number[], yearOverride?: number) => {
         const year = yearOverride || currentDate.getFullYear();
         setIsLoading(true);
-        const promises = targetMonths.map(m => api.addFixedExpense({ ...base, isPaid: false, month: m, year: year }));
-        await Promise.all(promises);
-        await fetchSafely();
-        setShowModal(null);
+        try {
+            const promises = targetMonths.map(m => api.addFixedExpense({ ...base, isPaid: false, month: m, year: year }));
+            await Promise.all(promises);
+            await fetchSafely();
+            setShowModal(null);
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao salvar despesa fixa.");
+            setIsLoading(false);
+        }
     };
 
     const toggleFixedExpense = async (id: string) => {
@@ -502,7 +516,7 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
                         <h3 className="text-xl md:text-3xl font-black mb-8 flex items-center gap-3">{editingTransaction ? 'Editar Lançamento' : 'Novo Lançamento'}</h3>
                         <form onSubmit={async (e) => {
                             e.preventDefault();
-                            setIsLoading(true);
+                            // setIsLoading(true); // Handled by individual functions
                             const formDataObj = new FormData(e.currentTarget);
                             const val = parseFloat((formDataObj.get('amount') as string).replace(',', '.'));
                             const desc = formDataObj.get('description') as string;
@@ -535,7 +549,7 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
                             } else {
                                 const finalMonths = selectedMonths.length > 0 ? selectedMonths : [currentDate.getMonth()];
                                 if (showModal === TransactionType.CARD_EXPENSE) {
-                                    handleSmartAddCard({
+                                    await handleSmartAddCard({
                                         description: desc, amount: val,
                                         provider: formDataObj.get('provider') as CardProvider,
                                         totalInstallments: parseInt(formDataObj.get('totalInstallments') as string) || 1,
@@ -543,10 +557,10 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
                                         purchaseDate: new Date().toISOString()
                                     }, finalMonths, transactionYear);
                                 } else if (showModal === TransactionType.INCOME) {
-                                    handleAddIncome({ description: desc, amount: val, source: formDataObj.get('source') as IncomeSource, date: new Date().toISOString() }, finalMonths, transactionYear);
+                                    await handleAddIncome({ description: desc, amount: val, source: formDataObj.get('source') as IncomeSource, date: new Date().toISOString() }, finalMonths, transactionYear);
                                 } else if (showModal === TransactionType.FIXED_EXPENSE) {
                                     const category = formDataObj.get('category') as FixedExpenseCategory;
-                                    handleAddFixedExpense({ category, name: category === FixedExpenseCategory.OUTROS ? formDataObj.get('customName') as string : category, amount: val, dueDate: formDataObj.get('dueDate') as string }, finalMonths, transactionYear);
+                                    await handleAddFixedExpense({ category, name: category === FixedExpenseCategory.OUTROS ? formDataObj.get('customName') as string : category, amount: val, dueDate: formDataObj.get('dueDate') as string }, finalMonths, transactionYear);
                                 }
                             }
                         }} className="space-y-6">
@@ -610,9 +624,9 @@ export const GestaoInteligente: React.FC<GestaoInteligenteProps> = ({ onBack }) 
             {/* FAB */}
             <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2" ref={menuRef}>
                 <div className={`flex flex-col items-end gap-2 transition-all ${isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}>
-                    <button onClick={() => setShowModal(TransactionType.FIXED_EXPENSE)} className="bg-white p-3 rounded-xl shadow-xl flex items-center gap-2 font-bold text-xs"><Calendar size={14} /> Conta Fixa</button>
-                    <button onClick={() => setShowModal(TransactionType.CARD_EXPENSE)} className="bg-white p-3 rounded-xl shadow-xl flex items-center gap-2 font-bold text-xs"><CreditCard size={14} /> Cartão</button>
-                    <button onClick={() => setShowModal(TransactionType.INCOME)} className="bg-white p-3 rounded-xl shadow-xl flex items-center gap-2 font-bold text-xs"><TrendingUp size={14} /> Entrada</button>
+                    <button onClick={() => { setEditingTransaction(null); setShowModal(TransactionType.FIXED_EXPENSE); }} className="bg-white p-3 rounded-xl shadow-xl flex items-center gap-2 font-bold text-xs"><Calendar size={14} /> Conta Fixa</button>
+                    <button onClick={() => { setEditingTransaction(null); setShowModal(TransactionType.CARD_EXPENSE); }} className="bg-white p-3 rounded-xl shadow-xl flex items-center gap-2 font-bold text-xs"><CreditCard size={14} /> Cartão</button>
+                    <button onClick={() => { setEditingTransaction(null); setShowModal(TransactionType.INCOME); }} className="bg-white p-3 rounded-xl shadow-xl flex items-center gap-2 font-bold text-xs"><TrendingUp size={14} /> Entrada</button>
                 </div>
                 <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="w-16 h-16 bg-emerald-500 text-slate-900 rounded-2xl shadow-2xl flex items-center justify-center transition-all">
                     <Plus size={32} className={isMenuOpen ? 'rotate-45' : ''} />
